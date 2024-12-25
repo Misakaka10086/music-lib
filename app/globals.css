@@ -40,3 +40,19 @@ a {
     color-scheme: dark;
   }
 }
+
+@font-face {
+  font-family: "iconfont";
+  src: url("/icon/bilibili-iconfont.ttf?t=1735134873227") format("truetype");
+}
+@font-face {
+  font-family: "iconfont";
+  src: url("/icon/tiktok-iconfont.ttf?t=1735138684909") format("truetype");
+}
+.icon {
+  font-family: "iconfont" !important;
+  font-size: 23px; /* 根据需要调整大小 */
+  font-style: normal;
+  display: inline-block;
+  vertical-align: middle;
+}

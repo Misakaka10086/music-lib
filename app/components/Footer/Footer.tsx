@@ -2,7 +2,10 @@ import { Box, Container, Typography, Link, Stack } from "@mui/material";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import XIcon from "@mui/icons-material/X";
+import { BilibiliIconBox, TikTokIconBox } from "@/app/components/CustomeIcon/IconBox";
 import "@fontsource/italianno";
+import Image from "next/image";
+
 export const Footer = () => {
   return (
     <Box
@@ -26,6 +29,8 @@ export const Footer = () => {
             <GitHubIcon sx={{ color: "primary.main" }} />
             <YouTubeIcon sx={{ color: "primary.main" }} />
             <XIcon sx={{ color: "primary.main" }} />
+            <BilibiliIconBox sx={{ color: "primary.main" }}/>
+            <TikTokIconBox sx={{ color: "primary.main" }}/>
           </Stack>
 
           {/* Center section */}
