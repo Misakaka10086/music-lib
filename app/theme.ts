@@ -1,10 +1,7 @@
 import { createTheme, PaletteColorOptions } from "@mui/material/styles";
 import materialTheme from "./material-theme.json";
 
-const {
-  light: lightColors,
-  dark: darkColors,
-} = materialTheme.schemes;
+const { light: lightColors, dark: darkColors } = materialTheme.schemes;
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -130,7 +127,6 @@ declare module "@mui/material/styles" {
     scrim?: string;
     background?: string;
     onBackground?: string;
-
   }
 
   interface SimplePaletteColorOptions {
@@ -179,7 +175,6 @@ declare module "@mui/material/styles" {
     background?: string;
     onBackground?: string;
   }
-
 }
 
 export const lightTheme = createTheme({
@@ -247,7 +242,6 @@ export const lightTheme = createTheme({
       onErrorContainer: lightColors.onErrorContainer,
     },
     md3_other: {
-
       outline: lightColors.outline,
       outlineVariant: lightColors.outlineVariant,
       shadow: lightColors.shadow,
@@ -260,7 +254,6 @@ export const lightTheme = createTheme({
 
 export const darkTheme = createTheme({
   palette: {
-
     primary: {
       main: darkColors.primary,
       light: darkColors.primaryContainer,
@@ -324,8 +317,6 @@ export const darkTheme = createTheme({
       onErrorContainer: darkColors.onErrorContainer,
     },
     md3_other: {
-
-
       outline: darkColors.outline,
       outlineVariant: darkColors.outlineVariant,
       shadow: darkColors.shadow,

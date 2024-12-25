@@ -1,48 +1,30 @@
 "use client";
-import { Paper, Button, Box, Container, Stack } from "@mui/material";
-import { useState } from "react";
+import { Paper, Button, Box, Container, Stack, useScrollTrigger } from "@mui/material";
+import { useState, useMemo } from "react";
+import { buttonStyles } from "@/app/styles/buttonStyles";
+
 export default function Home() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const trigger = useScrollTrigger();
+  const buttonTop = useMemo(() => {
+    return trigger ? 10 : 74;  // 74 = AppBar height (64) + 10
+  }, [trigger]);
 
   return (
-    <Container
-      sx={{
-        display: "flex",
-        justifyContent: "space-around",
-        gap: 2,
-        alignItems: "flex-start",
-      }}
-    >
-      <Stack direction="column" spacing={2}>
-      <Box>
-        <Button variant="contained" color="primary">
-          primary
-        </Button>
-      <Button variant="contained" color="secondary">
-        secondary
+    <Container>
+      <Button
+        variant="contained"
+        sx={{ 
+          position: "sticky", 
+          top: buttonTop,
+          zIndex: 10,
+          transition: 'top 0.3s',
+          bgcolor: 'primary.primaryContainer',
+          color: 'primary.onPrimaryContainer',
+        }}
+      >
+        primary
       </Button>
-      <Button variant="contained" color="error">
-        error
-      </Button>
-      <Button variant="contained" color="warning">
-        warning
-        </Button>
-      </Box>
-      <Box>
-        <Button variant="outlined" color="primary">
-          primary
-        </Button>
-      <Button variant="outlined" color="secondary">
-        secondary
-      </Button>
-      <Button variant="outlined" color="error">
-        error
-      </Button>
-      <Button variant="outlined" color="warning">
-        warning
-        </Button>
-      </Box>
-      </Stack>
+
       {Array(100)
         .fill(null)
         .map((_, index) => (
