@@ -86,40 +86,6 @@ const SearchInput = ({ onSearch }: SearchInputProps) => {
         variant="standard"
         sx={{
           width: isMobile ? "75%" : "50%",
-          input: { color: "primary.onPrimaryContainer" },
-          "& label": {
-            color: "primary.main",
-          },
-          "& label.Mui-focused": {
-            color: "primary.main",
-          },
-          // "& .MuiOutlinedInput-root": {
-          //   "& fieldset": {
-          //     borderColor: "red",
-          //   },
-          //   "&:hover fieldset": {
-          //     borderColor: "red",
-          //   },
-          //   "&.Mui-focused fieldset": {
-          //     borderColor: "red",
-          //   },
-          // },
-          // "&:hover fieldset": {
-          //   borderColor: "red",
-          // },
-          // "& .MuiInput-root": {
-          //   color: "red",
-          // },
-          "& .MuiInput-underline:before": {
-            borderBottomColor: "primary.main",
-          },
-          "& .MuiInput-underline:after": {
-            borderBottomColor: "primary.main",
-          },
-
-          "& .MuiInput-underline:hover:before": {
-            borderBottomColor: "primary.main", // hover时的颜色
-          },
         }}
         value={inputValue}
         onChange={handleChange}

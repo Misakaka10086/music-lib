@@ -1,5 +1,6 @@
 import { createTheme, PaletteColorOptions } from "@mui/material/styles";
 import materialTheme from "./material-theme.json";
+import { outlinedInputClasses } from '@mui/material/OutlinedInput';
 
 const { light: lightColors, dark: darkColors } = materialTheme.schemes;
 
@@ -249,7 +250,35 @@ export const lightTheme = createTheme({
       background: lightColors.background,
       onBackground: lightColors.onBackground,
     },
+
   },
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+
+          '& .MuiInputBase-root': {
+            color: lightColors.primary,
+            '&:before': {
+              borderBottomColor: lightColors.primary
+            },
+            '&:hover:before': {
+              borderBottomColor: lightColors.primary
+            },
+            '&.Mui-focused:after': {
+              borderBottomColor: lightColors.primary
+            }
+          },
+          '& .MuiInputLabel-root': {
+            color: lightColors.primary,
+            '&.Mui-focused': {
+              color: lightColors.primary
+            }
+          },
+        }
+      }
+    }
+  }
 });
 
 export const darkTheme = createTheme({
@@ -325,4 +354,31 @@ export const darkTheme = createTheme({
       onBackground: darkColors.onBackground,
     },
   },
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+
+          '& .MuiInputBase-root': {
+            color: darkColors.primary,
+            '&:before': {
+              borderBottomColor: darkColors.primary
+            },
+            '&:hover:before': {
+              borderBottomColor: darkColors.primary
+            },
+            '&.Mui-focused:after': {
+              borderBottomColor: darkColors.primary
+            }
+          },
+          '& .MuiInputLabel-root': {
+            color: darkColors.primary,
+            '&.Mui-focused': {
+              color: darkColors.primary
+            }
+          },
+        }
+      }
+    }
+  }
 });
