@@ -310,11 +310,20 @@ export const lightTheme = createTheme({
       styleOverrides: {
         root: {
           color: lightColors.primary,
+          WebkitTapHighlightColor: 'transparent',
           '&:hover': {
-            backgroundColor: lightColors.inversePrimary, // 14 = 8% opacity
+            backgroundColor: lightColors.inversePrimary,
+          },
+          '@media (hover: none)': {
+            '&:hover': {
+              backgroundColor: 'transparent'
+            },
+            '&:active': {
+              backgroundColor: `${lightColors.inversePrimary}4D`
+            }
           },
           '&.Mui-disabled': {
-            color: `${lightColors.onSurface}38`, // 38 = 38% opacity
+            color: `${lightColors.onSurface}38`,
           },
           // // Standard variants
           // '&.MuiIconButton-colorPrimary': {
@@ -488,11 +497,20 @@ export const darkTheme = createTheme({
       styleOverrides: {
         root: {
           color: darkColors.primary,
+          WebkitTapHighlightColor: 'transparent',
           '&:hover': {
             backgroundColor: darkColors.inversePrimary,
           },
+          '@media (hover: none)': {
+            '&:hover': {
+              backgroundColor: 'transparent'
+            },
+            '&:active': {
+              backgroundColor: `${darkColors.inversePrimary}4D`
+            }
+          },
           '&.Mui-disabled': {
-            color: `${darkColors.onSurface}38`, // 38 = 38% opacity
+            color: `${darkColors.onSurface}38`,
           },
           // // Standard variants
           // '&.MuiIconButton-colorPrimary': {

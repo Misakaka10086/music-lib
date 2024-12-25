@@ -61,16 +61,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   sx={{ color: theme.palette.primary.onPrimaryFixed }}
                 />
               </IconButton>
-              <Link href="/home" passHref style={{ textDecoration: "none" }}>
+              <Link href="/home" passHref style={{ textDecoration: "none", WebkitTapHighlightColor: 'transparent' }}>
                 <IconButton
-                  sx={{ color: theme.palette.primary.onPrimaryFixed }}
+                  sx={{ 
+                    color: theme.palette.primary.onPrimaryFixed,
+                    WebkitTapHighlightColor: 'transparent',
+                  }}
                 >
                   <HomeIcon />
                 </IconButton>
               </Link>
-              <Link href="/setting" passHref style={{ textDecoration: "none" }}>
+              <Link href="/setting" passHref style={{ textDecoration: "none", WebkitTapHighlightColor: 'transparent' }}>
                 <IconButton
-                  sx={{ color: theme.palette.primary.onPrimaryFixed }}
+                  sx={{ 
+                    color: theme.palette.primary.onPrimaryFixed,
+                    WebkitTapHighlightColor: 'transparent',
+                  }}
                 >
                   <SettingsIcon />
                 </IconButton>
