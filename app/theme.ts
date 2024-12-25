@@ -277,7 +277,83 @@ export const lightTheme = createTheme({
           },
         }
       }
-    }
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          backgroundColor: lightColors.surfaceContainer,
+          color: lightColors.onSurface,
+          '&.MuiChip-filled': {
+            backgroundColor: lightColors.secondaryContainer,
+            color: lightColors.onSecondaryContainer,
+          },
+          '&.MuiChip-outlined': {
+            borderColor: lightColors.outline,
+            color: lightColors.onSurface,
+          },
+          '&.Mui-disabled': {
+            opacity: 0.38,
+          }
+        },
+        deleteIcon: {
+          color: lightColors.onSurfaceVariant,
+          '&:hover': {
+            color: lightColors.onSurface,
+          }
+        },
+        icon: {
+          color: lightColors.primary
+        }
+      }
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          color: lightColors.primary,
+          '&:hover': {
+            backgroundColor: lightColors.inversePrimary, // 14 = 8% opacity
+          },
+          '&.Mui-disabled': {
+            color: `${lightColors.onSurface}38`, // 38 = 38% opacity
+          },
+          // // Standard variants
+          // '&.MuiIconButton-colorPrimary': {
+          //   color: lightColors.primary,
+          //   '&:hover': {
+          //     backgroundColor: `${lightColors.primary}14`,
+          //   }
+          // },
+          // '&.MuiIconButton-colorSecondary': {
+          //   color: lightColors.secondary,
+          //   '&:hover': {
+          //     backgroundColor: `${lightColors.secondary}14`,
+          //   }
+          // },
+          // '&.MuiIconButton-colorError': {
+          //   color: lightColors.error,
+          //   '&:hover': {
+          //     backgroundColor: `${lightColors.error}14`,
+          //   }
+          // }
+        },
+      }
+    },
+    MuiDivider: {
+      styleOverrides: {
+        root: {
+          borderColor: lightColors.outlineVariant,
+          '&.MuiDivider-vertical': {
+            borderColor: lightColors.outlineVariant,
+          },
+          '&.MuiDivider-middle': {
+            borderColor: lightColors.outlineVariant,
+          },
+          '&.MuiDivider-light': {
+            borderColor: `${lightColors.outlineVariant}3D`, // 24% opacity
+          }
+        },
+      }
+    },
   }
 });
 
@@ -379,6 +455,82 @@ export const darkTheme = createTheme({
           },
         }
       }
-    }
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          backgroundColor: darkColors.surfaceContainer,
+          color: darkColors.onSurface,
+          '&.MuiChip-filled': {
+            backgroundColor: darkColors.secondaryContainer,
+            color: darkColors.onSecondaryContainer,
+          },
+          '&.MuiChip-outlined': {
+            borderColor: darkColors.outline,
+            color: darkColors.onSurface,
+          },
+          '&.Mui-disabled': {
+            opacity: 0.38,
+          }
+        },
+        deleteIcon: {
+          color: darkColors.onSurfaceVariant,
+          '&:hover': {
+            color: darkColors.onSurface,
+          }
+        },
+        icon: {
+          color: darkColors.primary
+        }
+      }
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          color: darkColors.primary,
+          '&:hover': {
+            backgroundColor: darkColors.inversePrimary,
+          },
+          '&.Mui-disabled': {
+            color: `${darkColors.onSurface}38`, // 38 = 38% opacity
+          },
+          // // Standard variants
+          // '&.MuiIconButton-colorPrimary': {
+          //   color: darkColors.primary,
+          //   '&:hover': {
+          //     backgroundColor: `${darkColors.primary}14`,
+          //   }
+          // },
+          // '&.MuiIconButton-colorSecondary': {
+          //   color: darkColors.secondary,
+          //   '&:hover': {
+          //     backgroundColor: `${darkColors.secondary}14`,
+          //   }
+          // },
+          // '&.MuiIconButton-colorError': {
+          //   color: darkColors.error,
+          //   '&:hover': {
+          //     backgroundColor: `${darkColors.error}14`,
+          //   }
+          // }
+        },
+      }
+    },
+    MuiDivider: {
+      styleOverrides: {
+        root: {
+          borderColor: darkColors.outlineVariant,
+          '&.MuiDivider-vertical': {
+            borderColor: darkColors.outlineVariant,
+          },
+          '&.MuiDivider-middle': {
+            borderColor: darkColors.outlineVariant,
+          },
+          '&.MuiDivider-light': {
+            borderColor: `${darkColors.outlineVariant}3D`, // 24% opacity
+          }
+        },
+      }
+    },
   }
 });
