@@ -43,11 +43,11 @@ export default function Home() {
         </Button>
       </Box>
       </Stack>
-      {/* {Array(100)
+      {Array(100)
         .fill(null)
         .map((_, index) => (
           <br key={index} />
-        ))} */}
+        ))}
     </Container>
   );
 }

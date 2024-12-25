@@ -11,7 +11,7 @@ export const Footer = () => {
         py: 3,
         px: 2,
         mt: "auto",
-        backgroundColor: (theme) => theme.palette.background.paper,
+        backgroundColor: (theme) => theme.palette.surface.surfaceContainer,
       }}
     >
       <Container maxWidth="lg">
