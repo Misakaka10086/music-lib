@@ -4,7 +4,7 @@ import { createPool } from '@vercel/postgres';
 import { MusicCardData } from "@/app/components/MusicCard/types";
 
 const pool = createPool({
-  connectionString: process.env.POSTGRES_URL,
+  connectionString: process.env.POSTGRES_URL || process.env.VERCEL_POSTGRES_URL,
 });
 
 async function fetchAllMusicCardData(): Promise<MusicCardData[]> {
