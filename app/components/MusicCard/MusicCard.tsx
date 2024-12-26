@@ -17,6 +17,7 @@ import ActionButtons from "./ActionButtons";
 import { MusicCardProps } from "./types";
 import dynamic from "next/dynamic";
 
+
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: "#fff",
   ...theme.typography.body2,

@@ -1,82 +1,61 @@
-// components/MusicCardSkeleton.tsx
-'use client';
+"use client";
 
-import React, { memo } from 'react';
-import { Box,  Skeleton, useMediaQuery, useTheme } from '@mui/material';
-import Grid from '@mui/material/Grid2';
-import { styles } from './styles';
+import React from "react";
+import {
+  Box,
+  Skeleton,
+  Grid2 as Grid,
+} from "@mui/material";
+import { useMediaQuery, useTheme } from "@mui/material";
 
-const MusicCardSkeleton = memo(() => {
+const MusicCardSkeleton = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
-    <Box>
-      <Box
-        sx={{
-          ...styles.cardBase,
-          ...(isMobile ? styles.mobileCard : styles.desktopCard),
-        }}
-        role="article"
-        aria-label="Loading Music"
-      >
-        <Grid container alignItems="center" spacing={2}>
-          {/* Image Skeleton */}
-          <Grid >
-            <Box sx={styles.imageContainer}>
-              <Skeleton variant="rectangular" width={40} height={40} />
-            </Box>
+    <Box component="article" aria-label="Loading Music Card">
+      <Box sx={{ p: 1.5 }}>
+        <Grid
+          container
+          alignItems="center"
+          spacing={1}
+          direction={isMobile ? "column" : "row"}
+          sx={{ flexGrow: 1 }}
+        >
+          <Grid size={{ xs: 12, md: 3 }} container spacing={3}>
+            <Grid size="auto">
+              <Skeleton
+                variant="rectangular"
+                width={60}
+                height={60}
+                sx={{
+                  borderRadius: theme.shape.borderRadius / 2,
+                  mr: 1,
+                }}
+              />
+            </Grid>
+            <Grid size="grow">
+              <Skeleton
+                animation="wave"
+                height={24}
+                width="80%"
+                style={{ marginBottom: 6 }}
+              />
+              <Skeleton animation="wave" height={20} width="60%" />
+            </Grid>
           </Grid>
 
-          {/* Title and Artist Skeletons */}
-          <Grid   sx={{ minWidth: 0 }}>
-            <Skeleton variant="text" sx={{ fontSize: '1rem' }} width="60%" />
-            <Skeleton variant="text" sx={{ fontSize: '0.8rem' }} width="40%" />
+          <Grid size={{ xs: 12, md: "grow" }}>
+            <Skeleton animation="wave" height={24} />
           </Grid>
-
-          {/* Desktop Tags Skeleton */}
-          {!isMobile && (
-            <Grid  sx={styles.tagsContainer}>
-              <Skeleton variant="rounded" width={60} height={24} />
-              <Skeleton variant="rounded" width={50} height={24} />
-            </Grid>
-          )}
-
-          {/* Desktop Action Buttons Skeletons */}
-          {!isMobile && (
-            <Grid  sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Skeleton variant="circular" width={24} height={24} />
-              <Skeleton variant="circular" width={24} height={24} />
-              <Skeleton variant="circular" width={24} height={24} />
-            </Grid>
-          )}
-
-          {/* Mobile Tags Skeleton */}
-          {isMobile && (
-            <Grid >
-              <Box sx={styles.tagsContainer}>
-                <Skeleton variant="rounded" width={50} height={20} />
-                <Skeleton variant="rounded" width={40} height={20} />
-              </Box>
-            </Grid>
-          )}
-
-          {/* Mobile Action Buttons Skeletons */}
-          {isMobile && (
-            <Grid   sx={styles.mobileActions}>
-              <Skeleton variant="circular" width={24} height={24} />
-              <Skeleton variant="circular" width={24} height={24} />
-              <Skeleton variant="circular" width={24} height={24} />
-            </Grid>
-          )}
+          <Grid size={{ xs: 12, md: 2 }}>
+            <Skeleton animation="wave" height={24} />
+          </Grid>
         </Grid>
       </Box>
-      {/* No Divider Skeleton needed as it's a simple line */}
-      <Skeleton variant="rectangular" height={1} width="100%" />
+      <Skeleton animation="wave" height={1} />
     </Box>
   );
-});
-
-MusicCardSkeleton.displayName = 'MusicCardSkeleton';
+};
 
 export default MusicCardSkeleton;

@@ -1,6 +1,6 @@
 import { createTheme, PaletteColorOptions } from "@mui/material/styles";
 import materialTheme from "./material-theme.json";
-import { outlinedInputClasses } from '@mui/material/OutlinedInput';
+import { outlinedInputClasses } from "@mui/material/OutlinedInput";
 
 const { light: lightColors, dark: darkColors } = materialTheme.schemes;
 
@@ -250,79 +250,77 @@ export const lightTheme = createTheme({
       background: lightColors.background,
       onBackground: lightColors.onBackground,
     },
-
   },
   components: {
     MuiTextField: {
       styleOverrides: {
         root: {
-
-          '& .MuiInputBase-root': {
+          "& .MuiInputBase-root": {
             color: lightColors.primary,
-            '&:before': {
-              borderBottomColor: lightColors.primary
+            "&:before": {
+              borderBottomColor: lightColors.primary,
             },
-            '&:hover:before': {
-              borderBottomColor: lightColors.primary
+            "&:hover:before": {
+              borderBottomColor: lightColors.primary,
             },
-            '&.Mui-focused:after': {
-              borderBottomColor: lightColors.primary
-            }
+            "&.Mui-focused:after": {
+              borderBottomColor: lightColors.primary,
+            },
           },
-          '& .MuiInputLabel-root': {
+          "& .MuiInputLabel-root": {
             color: lightColors.primary,
-            '&.Mui-focused': {
-              color: lightColors.primary
-            }
+            "&.Mui-focused": {
+              color: lightColors.primary,
+            },
           },
-        }
-      }
+        },
+      },
     },
     MuiChip: {
       styleOverrides: {
         root: {
           backgroundColor: lightColors.surfaceContainer,
           color: lightColors.onSurface,
-          '&.MuiChip-filled': {
+          "&.MuiChip-filled": {
             backgroundColor: lightColors.secondaryContainer,
             color: lightColors.onSecondaryContainer,
           },
-          '&.MuiChip-outlined': {
+          "&.MuiChip-outlined": {
             borderColor: lightColors.outline,
             color: lightColors.onSurface,
           },
-          '&.Mui-disabled': {
+          "&.Mui-disabled": {
             opacity: 0.38,
-          }
+          },
         },
         deleteIcon: {
           color: lightColors.onSurfaceVariant,
-          '&:hover': {
+          "&:hover": {
             color: lightColors.onSurface,
-          }
+          },
         },
         icon: {
-          color: lightColors.primary
-        }
-      }
+          color: lightColors.primary,
+        },
+      },
     },
     MuiIconButton: {
       styleOverrides: {
         root: {
           color: lightColors.primary,
-          WebkitTapHighlightColor: 'transparent',
-          '&:hover': {
+          WebkitTapHighlightColor: "transparent",
+          "&:hover": {
             backgroundColor: lightColors.inversePrimary,
           },
-          '@media (hover: none)': {
-            '&:hover': {
-              backgroundColor: 'transparent'
+          "@media (hover: none)": {
+            "&:hover": {
+              backgroundColor: "transparent",
             },
-            '&:active': {
-              backgroundColor: `${lightColors.inversePrimary}4D`
-            }
+            "&:active": {
+              backgroundColor: `${lightColors.inversePrimary}4D`,
+            },
           },
-          '&.Mui-disabled': {
+          "&.Mui-disabled": {
             color: `${lightColors.onSurface}38`,
           },
           // // Standard variants
@@ -345,25 +343,40 @@ export const lightTheme = createTheme({
           //   }
           // }
         },
-      }
+      },
     },
     MuiDivider: {
       styleOverrides: {
         root: {
           borderColor: lightColors.outlineVariant,
-          '&.MuiDivider-vertical': {
+          "&.MuiDivider-vertical": {
             borderColor: lightColors.outlineVariant,
           },
-          '&.MuiDivider-middle': {
+          "&.MuiDivider-middle": {
             borderColor: lightColors.outlineVariant,
           },
-          '&.MuiDivider-light': {
+          "&.MuiDivider-light": {
             borderColor: `${lightColors.outlineVariant}3D`, // 24% opacity
-          }
+          },
         },
-      }
+      },
     },
-  }
+    MuiSkeleton: {
+      styleOverrides: {
+        root: {
+          backgroundColor: lightColors.surfaceContainer,
+        },
+        rectangular: {
+          borderRadius: "4px",
+        },
+        wave: {
+          "&::after": {
+            background: `linear-gradient(90deg, transparent, ${lightColors.surfaceContainerHigh}, transparent)`,
+          },
+        },
+      },
+    },
+  },
 });
 
 export const darkTheme = createTheme({
@@ -443,73 +456,72 @@ export const darkTheme = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
-
-          '& .MuiInputBase-root': {
+          "& .MuiInputBase-root": {
             color: darkColors.primary,
-            '&:before': {
-              borderBottomColor: darkColors.primary
+            "&:before": {
+              borderBottomColor: darkColors.primary,
             },
-            '&:hover:before': {
-              borderBottomColor: darkColors.primary
+            "&:hover:before": {
+              borderBottomColor: darkColors.primary,
             },
-            '&.Mui-focused:after': {
-              borderBottomColor: darkColors.primary
-            }
+            "&.Mui-focused:after": {
+              borderBottomColor: darkColors.primary,
+            },
           },
-          '& .MuiInputLabel-root': {
+          "& .MuiInputLabel-root": {
             color: darkColors.primary,
-            '&.Mui-focused': {
-              color: darkColors.primary
-            }
+            "&.Mui-focused": {
+              color: darkColors.primary,
+            },
           },
-        }
-      }
+        },
+      },
     },
     MuiChip: {
       styleOverrides: {
         root: {
           backgroundColor: darkColors.surfaceContainer,
           color: darkColors.onSurface,
-          '&.MuiChip-filled': {
+          "&.MuiChip-filled": {
             backgroundColor: darkColors.secondaryContainer,
             color: darkColors.onSecondaryContainer,
           },
-          '&.MuiChip-outlined': {
+          "&.MuiChip-outlined": {
             borderColor: darkColors.outline,
             color: darkColors.onSurface,
           },
-          '&.Mui-disabled': {
+          "&.Mui-disabled": {
             opacity: 0.38,
-          }
+          },
         },
         deleteIcon: {
           color: darkColors.onSurfaceVariant,
-          '&:hover': {
+          "&:hover": {
             color: darkColors.onSurface,
-          }
+          },
         },
         icon: {
-          color: darkColors.primary
-        }
-      }
+          color: darkColors.primary,
+        },
+      },
     },
     MuiIconButton: {
       styleOverrides: {
         root: {
           color: darkColors.primary,
-          WebkitTapHighlightColor: 'transparent',
-          '&:hover': {
+          WebkitTapHighlightColor: "transparent",
+          "&:hover": {
             backgroundColor: darkColors.inversePrimary,
           },
-          '@media (hover: none)': {
-            '&:hover': {
-              backgroundColor: 'transparent'
+          "@media (hover: none)": {
+            "&:hover": {
+              backgroundColor: "transparent",
             },
-            '&:active': {
-              backgroundColor: `${darkColors.inversePrimary}4D`
-            }
+            "&:active": {
+              backgroundColor: `${darkColors.inversePrimary}4D`,
+            },
           },
-          '&.Mui-disabled': {
+          "&.Mui-disabled": {
             color: `${darkColors.onSurface}38`,
           },
           // // Standard variants
@@ -532,23 +544,38 @@ export const darkTheme = createTheme({
           //   }
           // }
         },
-      }
+      },
     },
     MuiDivider: {
       styleOverrides: {
         root: {
           borderColor: darkColors.outlineVariant,
-          '&.MuiDivider-vertical': {
+          "&.MuiDivider-vertical": {
             borderColor: darkColors.outlineVariant,
           },
-          '&.MuiDivider-middle': {
+          "&.MuiDivider-middle": {
             borderColor: darkColors.outlineVariant,
           },
-          '&.MuiDivider-light': {
+          "&.MuiDivider-light": {
             borderColor: `${darkColors.outlineVariant}3D`, // 24% opacity
-          }
+          },
         },
-      }
+      },
     },
-  }
+    MuiSkeleton: {
+      styleOverrides: {
+        root: {
+          backgroundColor: darkColors.surfaceContainer,
+        },
+        rectangular: {
+          borderRadius: "4px",
+        },
+        wave: {
+          "&::after": {
+            background: `linear-gradient(90deg, transparent, ${darkColors.surfaceContainerHigh}, transparent)`,
+          },
+        },
+      },
+    },
+  },
 });
