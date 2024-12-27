@@ -33,7 +33,7 @@ export function HideOnScroll(props: Props) {
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const theme = useMemo(
     () => (isDarkMode ? darkTheme : lightTheme),
     [isDarkMode]
