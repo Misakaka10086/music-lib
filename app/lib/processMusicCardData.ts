@@ -150,3 +150,18 @@ export async function updateMusicCardDataByMusicId(musicCardData: MusicCardData)
   }
 }
 
+// export async function deleteMusicCardDataByMusicId(music_id: string) {
+//   await pool.query(`DELETE FROM music_info WHERE id = $1`, [music_id]);
+//   //await pool.query(`DELETE FROM music_tag WHERE music_info_id = $1`, [music_id]);
+// }
+
+export async function deleteMusicCardDataByMusicId(music_id: string) {
+
+    // Before deleting from music_info, delete any related records in music_tag
+    await pool.query(`DELETE FROM music_tag WHERE music_info_id = $1`, [music_id]);
+
+    const result = await pool.query(`DELETE FROM music_info WHERE id = $1`, [music_id]);
+
+    return result;
+
+}

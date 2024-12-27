@@ -14,7 +14,7 @@ import { stickySearchStyle } from "@/app/components/SearchInput/searchInput";
 import { MusicCardData } from "@/app/components/MusicCard/types";
 import MusicCard from "@/app/components/MusicCard/MusicCard";
 import { useInView } from "react-intersection-observer";
-import { fetchAllMusicCardData } from "@/app/lib/fetchMusicCardData";
+import { fetchAllMusicCardData } from "@/app/lib/processMusicCardData";
 import MusicCardSkeleton from "@/app/components/MusicCard/Skeleton";
 
 const PAGE_SIZE = 5; // Number of items to load per page

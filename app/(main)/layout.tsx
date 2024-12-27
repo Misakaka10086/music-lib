@@ -49,7 +49,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <HideOnScroll>
           <AppBar
             sx={{
-              bgcolor: (theme) => theme.palette.primary.primaryFixed,
+              bgcolor: (theme) => theme.palette.primary.fixed,
             }}
           >
             <Toolbar>
@@ -58,13 +58,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 aria-label="Toggle dark mode"
               >
                 <Brightness4Icon
-                  sx={{ color: theme.palette.primary.onPrimaryFixed }}
+                  sx={{ color: theme.palette.primary.onFixed }}
                 />
               </IconButton>
               <Link href="/home" passHref style={{ textDecoration: "none", WebkitTapHighlightColor: 'transparent' }}>
                 <IconButton
                   sx={{ 
-                    color: theme.palette.primary.onPrimaryFixed,
+                    color: theme.palette.primary.onFixed,
                     WebkitTapHighlightColor: 'transparent',
                   }}
                 >
@@ -74,7 +74,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <Link href="/setting" passHref style={{ textDecoration: "none", WebkitTapHighlightColor: 'transparent' }}>
                 <IconButton
                   sx={{ 
-                    color: theme.palette.primary.onPrimaryFixed,
+                    color: theme.palette.primary.onFixed,
                     WebkitTapHighlightColor: 'transparent',
                   }}
                 >

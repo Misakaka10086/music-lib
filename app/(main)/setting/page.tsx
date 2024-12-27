@@ -2,7 +2,7 @@
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { Box, Button, Container, useScrollTrigger } from "@mui/material";
 import MusicCard from "@/app/components/MusicCard/MusicCard";
-import { fetchAllMusicCardData } from "@/app/lib/fetchMusicCardData";
+import { fetchAllMusicCardData } from "@/app/lib/processMusicCardData";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { MusicCardData } from "@/app/components/MusicCard/types";
 import MusicCardSkeleton from "@/app/components/MusicCard/Skeleton";
@@ -102,20 +102,6 @@ export default function SettingPage() {
     >
       <SearchInput />
     </Box>
-
-    {/* <div style={{ padding: 20 }}>
-      <Button variant="contained" onClick={() => setModalOpen(true)}>
-        Open Modal
-      </Button>
-      <EditMusicCard
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        music_id="1"
-        onSave={() => {
-          console.log("Music data updated successfully");
-        }}
-      />
-    </div> */}
     
     <Box sx={{ p: 2, overflow: "auto" }}>
     {musicData.map((music, index) => (

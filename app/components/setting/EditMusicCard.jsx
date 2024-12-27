@@ -1,6 +1,18 @@
-import { useState, useEffect } from 'react';
-import { Modal, Box, Button, Badge, Avatar, TextField, Chip } from '@mui/material';
-import { fetchMusicCardDataByMusicId, updateMusicCardDataByMusicId } from '@/app/lib/fetchMusicCardData';
+import { useState, useEffect } from "react";
+import {
+  Modal,
+  Box,
+  Button,
+  Badge,
+  Avatar,
+  TextField,
+  Chip,
+} from "@mui/material";
+import {
+  fetchMusicCardDataByMusicId,
+  updateMusicCardDataByMusicId,
+  deleteMusicCardDataByMusicId,
+} from "@/app/lib/processMusicCardData";
 
 const EditMusicCard = ({ open, onClose, music_id, onSave }) => {
   const [currentTags, setCurrentTags] = useState([]);
@@ -17,8 +29,17 @@ const EditMusicCard = ({ open, onClose, music_id, onSave }) => {
         try {
           const data = await fetchMusicCardDataByMusicId(music_id);
           if (data) {
-            setMusicData(data);
-            setCurrentTags(data.tags);
+            // Ensure we create a plain object
+            const plainData = {
+              music_id: data.music_id,
+              music_title: data.music_title || "",
+              original_artist: data.original_artist || "",
+              tags: Array.isArray(data.tags) ? [...data.tags] : [],
+              image_url: data.image_url || null,
+              favorite: Boolean(data.favorite)
+            };
+            setMusicData(plainData);
+            setCurrentTags(plainData.tags);
           }
         } catch (error) {
           console.error("Error fetching music data:", error);
@@ -34,8 +55,8 @@ const EditMusicCard = ({ open, onClose, music_id, onSave }) => {
   // Update state when musicData changes
   useEffect(() => {
     if (musicData) {
-      setTitle(musicData.music_title);
-      setArtist(musicData.original_artist);
+      setTitle(musicData.music_title || "");
+      setArtist(musicData.original_artist || "");
     }
   }, [musicData]);
 
@@ -57,11 +78,14 @@ const EditMusicCard = ({ open, onClose, music_id, onSave }) => {
         return;
       }
 
+      // Create a plain object for update
       const updatedData = {
-        ...musicData,
+        music_id: musicData.music_id,
         music_title: title,
         original_artist: artist,
         tags: currentTags,
+        image_url: musicData.image_url || null,
+        favorite: Boolean(musicData.favorite)
       };
 
       const result = await updateMusicCardDataByMusicId(updatedData);
@@ -69,10 +93,36 @@ const EditMusicCard = ({ open, onClose, music_id, onSave }) => {
         throw new Error("Update operation returned falsy result");
       }
 
-      onSave(updatedData);
+      // Ensure we pass a plain object
+      onSave({
+        ...updatedData,
+        success: true
+      });
       onClose();
     } catch (error) {
       console.error("Update failed:", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      if (!musicData) {
+        console.error("No music data to delete");
+        return;
+      }
+      const result = await deleteMusicCardDataByMusicId(musicData.music_id);
+      if (!result) {
+        throw new Error("Delete operation returned falsy result");
+      }
+      onClose();
+      // Ensure we pass a plain object
+      onSave({ 
+        deleted: true, 
+        music_id: musicData.music_id,
+        success: true
+      });
+    } catch (error) {
+      console.error("Delete failed:", error);
     }
   };
 
@@ -89,7 +139,7 @@ const EditMusicCard = ({ open, onClose, music_id, onSave }) => {
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: 400,
-          bgcolor: "background.paper",
+          bgcolor: "secondary.container",
           borderRadius: 2,
           boxShadow: 24,
           p: 4,
@@ -103,25 +153,54 @@ const EditMusicCard = ({ open, onClose, music_id, onSave }) => {
           >
             <Avatar src={musicData.image_url} sx={{ width: 60, height: 60 }} />
           </Badge>
-          <Button variant="contained" color="primary">
+          <Button
+            variant="contained"
+            sx={{ bgcolor: "secondary.fixed", color: "secondary.onFixed" }}
+          >
             Upload Image
           </Button>
         </Box>
 
         <TextField
           label="Title"
-          value={title}
+          value={title || ""}
           onChange={(e) => setTitle(e.target.value)}
           fullWidth
           margin="normal"
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "secondary.onContainer !important",
+              },
+              "&:hover fieldset": {
+                borderColor: "secondary.onContainer !important",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "secondary.onContainer !important",
+              },
+            },
+          }}
         />
 
         <TextField
           label="Artist"
-          value={artist}
+          value={artist || ""}
           onChange={(e) => setArtist(e.target.value)}
           fullWidth
           margin="normal"
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "secondary.onContainer !important",
+              },
+              "&:hover fieldset": {
+                borderColor: "secondary.onContainer !important",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "secondary.onContainer !important",
+              },
+            },
+          }}
         />
 
         <Box sx={{ mt: 2 }}>
@@ -130,30 +209,78 @@ const EditMusicCard = ({ open, onClose, music_id, onSave }) => {
               key={tag}
               label={tag}
               onDelete={() => handleRemoveTag(tag)}
-              sx={{ mr: 1, mb: 1 }}
+              sx={{
+                bgcolor: (theme) =>
+                  theme.palette.secondary.fixedDim + " !important",
+                color: (theme) =>
+                  theme.palette.secondary.onFixedVariant + " !important",
+                '& .MuiChip-deleteIcon': {
+                  color: (theme) => theme.palette.secondary.onFixedVariant
+                }
+              }}
             />
           ))}
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+        <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
           <TextField
             label="New Tag"
-            value={newTag}
+            value={newTag || ""}
             onChange={(e) => setNewTag(e.target.value)}
             fullWidth
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "secondary.onContainer !important",
+                },
+                "&:hover fieldset": {
+                  borderColor: "secondary.onContainer !important",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "secondary.onContainer !important",
+                },
+              },
+            }}
           />
-          <Button variant="contained" onClick={handleAddTag}>
+          <Button
+            variant="contained"
+            onClick={handleAddTag}
+            sx={{
+              bgcolor: (theme) => theme.palette.secondary.fixed,
+              color: (theme) => theme.palette.secondary.onFixed,
+            }}
+          >
             Add
           </Button>
         </Box>
 
-        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-          <Button variant="outlined" onClick={onClose}>
-            Cancel
+        <Box sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}>
+          <Button
+            variant="contained"
+            sx={{
+              bgcolor: (theme) => theme.palette.error.container,
+              color: (theme) => theme.palette.error.onContainer,
+            }}
+            onClick={handleDelete}
+          >
+            Delete
           </Button>
-          <Button variant="contained" onClick={handleSave}>
-            Save
-          </Button>
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button variant="outlined" onClick={onClose}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleSave}
+              sx={{
+                bgcolor: (theme) => theme.palette.primary.container,
+                color: (theme) => theme.palette.primary.onContainer,
+              }}
+            >
+              Save
+            </Button>
+          </Box>
         </Box>
       </Box>
     </Modal>
