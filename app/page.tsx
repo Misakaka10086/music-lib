@@ -1,9 +1,11 @@
 import Image from "next/image";
 import styles from "./page.module.css";
+import Firefly from "./components/Firefly/Firefly";
 
 export default function Home() {
   return (
     <div className={styles.page}>
+      <Firefly count={30} color="#d99df1" />
       <main className={styles.main}>
         <Image
           className={styles.logo}
