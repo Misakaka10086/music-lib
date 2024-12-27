@@ -1,3 +1,5 @@
+@use "sass:math";
+
 :root {
   --firefly-color: #d99df1;
   --firefly-glow-color: #ffbbef;
@@ -57,10 +59,10 @@
 
   @for $i from 1 through 50 {
     &:nth-child(#{$i}) {
-      left: random(100) * 1%;
-      top: random(100) * 1%;
-      animation-delay: random(2) - 2 + s;
-      animation-duration: (20 + random(20)) + s;
+      left: math.random(100) * 1%;
+      top: math.random(100) * 1%;
+      animation-delay: math.random(2) - 2 + s;
+      animation-duration: (20 + math.random(20)) + s;
     }
   }
 } 
