@@ -166,7 +166,7 @@ export default function SettingPage() {
 
   return (
     <Container>
-      <Box sx={{ p: 2 }}>
+      <Box sx={{ p: 2, minHeight:'100vh'}}>
         {loading ? (
           Array.from({ length: 10 }).map((_, index) => (
             <MusicCardSkeleton key={index} />

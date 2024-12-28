@@ -191,7 +191,7 @@ const MusicCard = memo(
 
     return (
       <Box component="article" aria-label={`Music: ${music_title}`}>
-        <NoSSR>
+        
           <CardBase isMobile={isMobile}>
             <Grid
               container
@@ -251,16 +251,17 @@ const MusicCard = memo(
               <Grid size={{ xs: 12, md: 2 }}>
                 <Item>4</Item>
               </Grid> */}
-              <NoSSR>
+              
                 <ResponsiveLayout
                   tags={renderTags}
                   actionButtons={actionButtons}
                 />
-              </NoSSR>
+              
             </Grid>
+            <Divider />
           </CardBase>
-        </NoSSR>
-        <Divider />
+        
+        
       </Box>
     );
   }
