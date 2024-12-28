@@ -210,7 +210,8 @@ const MusicCard = memo(
                 <Grid size="auto">
                   <ImageContainer>
                     <Image
-                      src={image_url || '/Untitled-1.png'}
+                      // src={image_url || '/Untitled-1.png'}
+                      src={'/Untitled-1.png'}
                       alt={`Cover for ${music_title}`}
                       width={60}
                       height={60}

@@ -1,142 +1,187 @@
 "use client";
-import { useUser } from '@auth0/nextjs-auth0/client';
-import { Box, Button, Container, useScrollTrigger } from "@mui/material";
-import MusicCard from "@/app/components/MusicCard/MusicCard";
-import { fetchAllMusicCardData } from "@/app/lib/processMusicCardData";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { Box, Container, CircularProgress } from "@mui/material";
+import { useEffect, useState, useCallback, useRef, Suspense, useMemo, memo } from "react";
 import { MusicCardData } from "@/app/components/MusicCard/types";
 import MusicCardSkeleton from "@/app/components/MusicCard/Skeleton";
-import { useInView } from "react-intersection-observer";
-import { stickySearchStyle } from '@/app/components/SearchInput/searchInput';
-import SearchInput from '@/app/components/SearchInput/SearchInput';
-import EditMusicCard from "@/app/components/setting/EditMusicCard";
+import { fetchAllMusicCardData } from "@/app/lib/processMusicCardData";
+import MusicCard from "@/app/components/MusicCard/MusicCard";
+import dynamic from "next/dynamic";
 
-const PAGE_SIZE = 15; // Number of items to load per page
+// 定义 EditMusicCard 组件的类型
+type EditMusicCardType = React.ComponentType<{
+  open: boolean;
+  onClose: () => void;
+  music_id: string;
+  onSave: (updatedMusic: MusicCardData) => void;
+}>;
+
+// 预加载 EditMusicCard 组件
+const EditMusicCard = dynamic(
+  () => import("@/app/components/setting/EditMusicCard"),
+  {
+    loading: () => <Box display="flex" justifyContent="center"><CircularProgress /></Box>,
+    ssr: false
+  }
+) as EditMusicCardType;
+
+// 预加载函数
+const preloadEditMusicCard = () => {
+  const startTime = performance.now();
+  import("@/app/components/setting/EditMusicCard").then(() => {
+    const endTime = performance.now();
+    console.log('Preload EditMusicCard time:', endTime - startTime, 'ms');
+  });
+};
+
+// 在空闲时预加载
+if (typeof window !== 'undefined') {
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(preloadEditMusicCard);
+  } else {
+    setTimeout(preloadEditMusicCard, 1000);
+  }
+}
+
+// 将 MusicCard 列表提取为单独的组件
+const MusicCardList = memo(({ 
+  musicData, 
+  onMoreOptions 
+}: { 
+  musicData: MusicCardData[],
+  onMoreOptions: (id: string) => void 
+}) => {
+  return (
+    <Box>
+      {musicData.map((music) => (
+        <Box key={music.music_id} sx={{ mb: 2 }}>
+          <MusicCard
+            {...music}
+            onDownload={() => console.log(`Download ${music.music_id}`)}
+            onFavorite={() => console.log(`Favorite ${music.music_id}`)}
+            onMoreOptions={() => onMoreOptions(music.music_id)}
+          />
+        </Box>
+      ))}
+    </Box>
+  );
+});
+
+MusicCardList.displayName = 'MusicCardList';
 
 export default function SettingPage() {
-  const { user, isLoading } = useUser();
+  const renderCount = useRef(0);
+  const isFirstRender = useRef(true);
+  const modalOpenTime = useRef<number | null>(null);
+
+  // Basic states
   const [musicData, setMusicData] = useState<MusicCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const { ref, inView } = useInView();
-
-  const loadMoreData = useCallback(async () => {
-    if (!hasMore) return;
-    
-    setLoading(true);
-    try {
-      const newData = await fetchAllMusicCardData(PAGE_SIZE, page);
-
-      setMusicData((prev) => [...prev, ...newData]);
-      
-      setPage((prev) => prev + 1);
-      
-      setHasMore(newData.length === PAGE_SIZE);
-    } catch (err) {
-      console.error("Error fetching music data:", err);
-      setError("Failed to load music data.");
-    } finally {
-      setLoading(false);
-    }
-  }, [page, hasMore]);
-
-
-  
-  useEffect(() => {
-    loadMoreData();
-  }, []);
-
-  useEffect(() => {
-    if (inView && hasMore) {
-      loadMoreData();
-    }
-  }, [inView, hasMore, loadMoreData]);
-
-  if (error) {
-    return <Box sx={{ p: 2, textAlign: "center", color: "error.main" }}>{error}</Box>;
-  }
-  const trigger = useScrollTrigger();
-  const buttonTop = useMemo(() => {
-    return trigger ? 10 : 74; // 74 = AppBar height (64) + 10
-  }, [trigger]);
-
-  const [modalOpen, setModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedMusicId, setSelectedMusicId] = useState<string | null>(null);
 
-  // Fetch initial data
+  // Event handlers with performance tracking
+  const handleMoreOptions = useCallback((musicId: string) => {
+    const startTime = performance.now();
+    // 使用 requestAnimationFrame 批量更新状态
+    requestAnimationFrame(() => {
+      setSelectedMusicId(musicId);
+      setEditModalOpen(true);
+      modalOpenTime.current = performance.now();
+      console.log('MoreOptions operation time:', performance.now() - startTime, 'ms');
+    });
+  }, []);
+
+  const handleCloseEditModal = useCallback(() => {
+    const startTime = performance.now();
+    // 使用 requestAnimationFrame 批量更新状态
+    requestAnimationFrame(() => {
+      setEditModalOpen(false);
+      setSelectedMusicId(null);
+      if (modalOpenTime.current) {
+        console.log('Modal was open for:', performance.now() - modalOpenTime.current, 'ms');
+        modalOpenTime.current = null;
+      }
+      console.log('CloseEditModal operation time:', performance.now() - startTime, 'ms');
+    });
+  }, []);
+
+  const handleSaveEdit = useCallback((updatedMusic: MusicCardData) => {
+    const startTime = performance.now();
+    setMusicData(prev => 
+      prev.map(music => 
+        music.music_id === updatedMusic.music_id ? updatedMusic : music
+      )
+    );
+    console.log('SaveEdit operation time:', performance.now() - startTime, 'ms');
+  }, []);
+
+  // 监控渲染次数
+  useEffect(() => {
+    const startTime = performance.now();
+    renderCount.current += 1;
+    const currentRender = renderCount.current;
+    
+    return () => {
+      if (isFirstRender.current) {
+        isFirstRender.current = false;
+        return;
+      }
+      console.log(`Render #${currentRender} took:`, performance.now() - startTime, 'ms');
+    };
+  });
+
+  // Initial data loading
   useEffect(() => {
     const fetchData = async () => {
-      const data = await fetchAllMusicCardData(PAGE_SIZE, 1);
-      setMusicData(data);
+      const startTime = performance.now();
+      try {
+        setLoading(true);
+        const data = await fetchAllMusicCardData(Number.MAX_SAFE_INTEGER, 1);
+        setMusicData(data);
+      } catch (err) {
+        setError("Failed to load music data");
+        console.error("Error loading music data:", err);
+      } finally {
+        setLoading(false);
+        console.log('Initial data loading took:', performance.now() - startTime, 'ms');
+      }
     };
+
     fetchData();
   }, []);
 
-  // Handle save callback
-  const handleSave = (updatedData: MusicCardData) => {
-    setMusicData((prevData) =>
-      prevData.map((item) =>
-        item.music_id === updatedData.music_id ? updatedData : item
-      )
+  // 使用 useMemo 缓存 EditMusicCard 组件
+  const editMusicCardComponent = useMemo(() => {
+    if (!editModalOpen || !selectedMusicId) return null;
+    return (
+      <EditMusicCard
+        open={editModalOpen}
+        onClose={handleCloseEditModal}
+        music_id={selectedMusicId}
+        onSave={handleSaveEdit}
+      />
     );
-    setModalOpen(false);
-    setSelectedMusicId(null);
-  };
+  }, [editModalOpen, selectedMusicId, handleCloseEditModal, handleSaveEdit]);
 
   return (
-    <Container
-    sx={{
-      justifyContent: "center",
-      display: "flex",
-      flexDirection: "column",
-    }}
-  >
-    <Box
-      sx={{
-        ...stickySearchStyle(buttonTop),
-        transition: "top 0.3s",
-        borderRadius: "1000px",
-      }}
-    >
-      <SearchInput />
-    </Box>
-    
-    <Box sx={{ p: 2, overflow: "auto" }}>
-    {musicData.map((music, index) => (
-      <MusicCard
-        key={`${music.music_id}-${index}`}
-        {...music}
-        onDownload={() => console.log(`Download ${music.music_id}`)}
-        onFavorite={() => console.log(`Favorite ${music.music_id}`)}
-        onMoreOptions={() => {
-          setSelectedMusicId(music.music_id);
-          setModalOpen(true);
-        }}
-      />
-    ))}
-    
-    {hasMore && (
-      <Box ref={ref} sx={{ p: 2 }}>
-        {Array.from({ length: 3 }).map((_, index) => (
-          <MusicCardSkeleton key={index} />
-        ))}
+    <Container>
+      <Box sx={{ p: 2 }}>
+        {loading ? (
+          Array.from({ length: 10 }).map((_, index) => (
+            <MusicCardSkeleton key={index} />
+          ))
+        ) : (
+          <MusicCardList 
+            musicData={musicData}
+            onMoreOptions={handleMoreOptions}
+          />
+        )}
       </Box>
-    )}
-  </Box>
 
-  {selectedMusicId && (
-    <EditMusicCard
-      open={modalOpen}
-      onClose={() => {
-        setModalOpen(false);
-        setSelectedMusicId(null);
-      }}
-      music_id={selectedMusicId}
-      onSave={handleSave}
-    />
-  )}
-  </Container>
+      <Suspense fallback={<Box display="flex" justifyContent="center"><CircularProgress /></Box>}>
+        {editMusicCardComponent}
+      </Suspense>
+    </Container>
   );
 }

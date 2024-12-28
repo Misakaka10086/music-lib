@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo, memo } from "react";
 import {
   Modal,
   Box,
@@ -14,7 +14,7 @@ import {
   deleteMusicCardDataByMusicId,
 } from "@/app/lib/processMusicCardData";
 
-const EditMusicCard = ({ open, onClose, music_id, onSave }) => {
+const EditMusicCard = memo(({ open, onClose, music_id, onSave }) => {
   const [currentTags, setCurrentTags] = useState([]);
   const [newTag, setNewTag] = useState("");
   const [musicData, setMusicData] = useState(null);
@@ -22,54 +22,90 @@ const EditMusicCard = ({ open, onClose, music_id, onSave }) => {
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
 
-  // Fetch music data when music_id changes
   useEffect(() => {
-    if (music_id) {
-      const fetchData = async () => {
-        try {
-          const data = await fetchMusicCardDataByMusicId(music_id);
-          if (data) {
-            // Ensure we create a plain object
-            const plainData = {
-              music_id: data.music_id,
-              music_title: data.music_title || "",
-              original_artist: data.original_artist || "",
-              tags: Array.isArray(data.tags) ? [...data.tags] : [],
-              image_url: data.image_url || null,
-              favorite: Boolean(data.favorite)
-            };
-            setMusicData(plainData);
-            setCurrentTags(plainData.tags);
-          }
-        } catch (error) {
-          console.error("Error fetching music data:", error);
-        } finally {
-          setLoading(false);
-        }
+    const startTime = performance.now();
+    
+    return () => {
+      const endTime = performance.now();
+      console.log('EditMusicCard actual render time:', endTime - startTime, 'ms');
+    };
+  }, []);
+
+  const fetchData = useCallback(async () => {
+    if (!music_id) return;
+    
+    console.time('EditMusicCard:fetchData');
+    setLoading(true);
+    
+    try {
+      const data = await fetchMusicCardDataByMusicId(music_id);
+      if (!data) return;
+
+      console.time('EditMusicCard:processData');
+      const plainData = {
+        music_id: data.music_id,
+        music_title: data.music_title || "",
+        original_artist: data.original_artist || "",
+        tags: Array.isArray(data.tags) ? [...data.tags] : [],
+        image_url: data.image_url || null,
+        favorite: Boolean(data.favorite)
       };
 
-      fetchData();
+      const updateState = () => {
+        setMusicData(plainData);
+        setCurrentTags(plainData.tags);
+        setTitle(plainData.music_title || "");
+        setArtist(plainData.original_artist || "");
+        setLoading(false);
+      };
+      
+      requestAnimationFrame(updateState);
+      
+      console.timeEnd('EditMusicCard:processData');
+    } catch (error) {
+      console.error("Error fetching music data:", error);
+      setLoading(false);
+    } finally {
+      console.timeEnd('EditMusicCard:fetchData');
     }
   }, [music_id]);
 
-  // Update state when musicData changes
   useEffect(() => {
-    if (musicData) {
-      setTitle(musicData.music_title || "");
-      setArtist(musicData.original_artist || "");
+    if (open && music_id) {
+      console.time('EditMusicCard:effect');
+      fetchData();
+      console.timeEnd('EditMusicCard:effect');
     }
-  }, [musicData]);
+  }, [open, music_id, fetchData]);
 
-  const handleAddTag = () => {
+  const handleCloseInternal = useCallback(() => {
+    console.time('EditMusicCard:close');
+    onClose();
+    console.timeEnd('EditMusicCard:close');
+  }, [onClose]);
+
+  const modalStyle = useMemo(() => ({
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "secondary.container",
+    borderRadius: 2,
+    boxShadow: 24,
+    p: 4,
+  }), []);
+
+  const handleAddTag = useCallback(() => {
     if (newTag.trim() && !currentTags.includes(newTag)) {
-      setCurrentTags([...currentTags, newTag]);
+      setCurrentTags(prev => [...prev, newTag]);
       setNewTag("");
     }
-  };
+  }, [newTag, currentTags]);
 
-  const handleRemoveTag = (tagToRemove) => {
-    setCurrentTags(currentTags.filter((tag) => tag !== tagToRemove));
-  };
+  const handleRemoveTag = useCallback((tagToRemove) => {
+    setCurrentTags(prev => prev.filter(tag => tag !== tagToRemove));
+  }, []);
 
   const handleSave = async () => {
     try {
@@ -78,7 +114,6 @@ const EditMusicCard = ({ open, onClose, music_id, onSave }) => {
         return;
       }
 
-      // Create a plain object for update
       const updatedData = {
         music_id: musicData.music_id,
         music_title: title,
@@ -93,7 +128,6 @@ const EditMusicCard = ({ open, onClose, music_id, onSave }) => {
         throw new Error("Update operation returned falsy result");
       }
 
-      // Ensure we pass a plain object
       onSave({
         ...updatedData,
         success: true
@@ -115,7 +149,6 @@ const EditMusicCard = ({ open, onClose, music_id, onSave }) => {
         throw new Error("Delete operation returned falsy result");
       }
       onClose();
-      // Ensure we pass a plain object
       onSave({ 
         deleted: true, 
         music_id: musicData.music_id,
@@ -131,20 +164,8 @@ const EditMusicCard = ({ open, onClose, music_id, onSave }) => {
   }
 
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: 400,
-          bgcolor: "secondary.container",
-          borderRadius: 2,
-          boxShadow: 24,
-          p: 4,
-        }}
-      >
+    <Modal open={open} onClose={handleCloseInternal}>
+      <Box sx={modalStyle}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3 }}>
           <Badge
             badgeContent={musicData.favorite}
@@ -285,6 +306,8 @@ const EditMusicCard = ({ open, onClose, music_id, onSave }) => {
       </Box>
     </Modal>
   );
-};
+});
+
+EditMusicCard.displayName = 'EditMusicCard';
 
 export default EditMusicCard;
