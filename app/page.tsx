@@ -16,6 +16,7 @@ export default function Home() {
         justifyContent: "center",
         alignItems: "center",
         gap: 4,
+        backgroundColor:"#171216"
       }}
     >
       <Firefly />

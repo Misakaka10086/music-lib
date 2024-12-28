@@ -7,7 +7,7 @@ import {
   Stack,
   useScrollTrigger,
 } from "@mui/material";
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, memo } from "react";
 import { buttonStyles } from "@/app/styles/buttonStyles";
 import SearchInput from "@/app/components/SearchInput/SearchInput";
 import { stickySearchStyle } from "@/app/components/SearchInput/searchInput";
@@ -17,49 +17,61 @@ import { useInView } from "react-intersection-observer";
 import { fetchAllMusicCardData } from "@/app/lib/processMusicCardData";
 import MusicCardSkeleton from "@/app/components/MusicCard/Skeleton";
 
-const PAGE_SIZE = 5; // Number of items to load per page
+// 将 MusicCard 列表提取为单独的组件
+const MusicCardList = memo(({ 
+  musicData, 
+  onMoreOptions 
+}: { 
+  musicData: MusicCardData[],
+  onMoreOptions: (id: string) => void 
+}) => {
+  return (
+    <Box>
+      {musicData.map((music) => (
+        <Box key={music.music_id} sx={{ mb: 2 }}>
+          <MusicCard
+            {...music}
+            onDownload={() => console.log(`Download ${music.music_id}`)}
+            onFavorite={() => console.log(`Favorite ${music.music_id}`)}
+            onMoreOptions={() => onMoreOptions(music.music_id)}
+          />
+        </Box>
+      ))}
+    </Box>
+  );
+});
+
+MusicCardList.displayName = 'MusicCardList';
 
 export default function Home() {
   const trigger = useScrollTrigger();
   const [musicData, setMusicData] = useState<MusicCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const { ref, inView } = useInView();
   const buttonTop = useMemo(() => {
     return trigger ? 10 : 74; // 74 = AppBar height (64) + 10
   }, [trigger]);
-  const loadMoreData = useCallback(async () => {
-    if (!hasMore) return;
 
-    setLoading(true);
-    try {
-      const data = await fetchAllMusicCardData(PAGE_SIZE, page);
-      const startIndex = (page - 1) * PAGE_SIZE;
-      const endIndex = startIndex + PAGE_SIZE;
-      const newData = data.slice(startIndex, endIndex);
+    // Initial data loading
+    useEffect(() => {
+      const fetchData = async () => {
+        const startTime = performance.now();
+        try {
+          setLoading(true);
+          const data = await fetchAllMusicCardData(Number.MAX_SAFE_INTEGER, 1);
+          setMusicData(data);
+        } catch (err) {
+          setError("Failed to load music data");
+          console.error("Error loading music data:", err);
+        } finally {
+          setLoading(false);
+          console.log('Initial data loading took:', performance.now() - startTime, 'ms');
+        }
+      };
+  
+      fetchData();
+    }, []);
 
-      setMusicData((prev) => [...prev, ...newData]);
-      setPage((prev) => prev + 1);
-      setHasMore(endIndex < data.length);
-    } catch (err) {
-      console.error("Error fetching music data:", err);
-      setError("Failed to load music data.");
-    } finally {
-      setLoading(false);
-    }
-  }, [page, hasMore]);
-
-  useEffect(() => {
-    loadMoreData();
-  }, []);
-
-  useEffect(() => {
-    if (inView && hasMore) {
-      loadMoreData();
-    }
-  }, [inView, hasMore, loadMoreData]);
   return (
     <Container
       sx={{
@@ -77,25 +89,16 @@ export default function Home() {
       >
         <SearchInput />
       </Box>
-      <Box sx={{ p: 2, overflow: "auto" }}>
-        {musicData.map((music, index) => (
-          <MusicCard
-            key={`${music.music_id}-${index}`}
-            {...music}
-            onDownload={() => console.log(`Download ${music.music_id}`)}
-            onFavorite={() => console.log(`Favorite ${music.music_id}`)}
-            onMoreOptions={() =>
-              console.log(`More options for ${music.music_id}`)
-            }
+      <Box sx={{ p: 2, minHeight:'100vh'}}>
+        {loading ? (
+          Array.from({ length: 10 }).map((_, index) => (
+            <MusicCardSkeleton key={index} />
+          ))
+        ) : (
+          <MusicCardList 
+            musicData={musicData}
+            onMoreOptions={() => console.log('More options')}
           />
-        ))}
-
-        {hasMore && (
-          <Box ref={ref} sx={{ p: 2 }}>
-            {Array.from({ length: 3 }).map((_, index) => (
-              <MusicCardSkeleton key={index} />
-            ))}
-          </Box>
         )}
       </Box>
     </Container>
