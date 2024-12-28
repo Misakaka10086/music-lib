@@ -1,54 +1,70 @@
 // utils/fetchAllMusicCardData.ts
 "use server";
+import { createPool } from "@vercel/postgres";
 import { MusicCardData } from "@/app/components/MusicCard/types";
-import * as fs from 'fs/promises';
-import path from 'path';
 
-const DATA_FILE_PATH = path.join(process.cwd(),'public', 'fake_data.json');
-
-async function readJsonData(): Promise<{ [key: string]: any }> {
-  try {
-    const fileContents = await fs.readFile(DATA_FILE_PATH, 'utf-8');
-    return JSON.parse(fileContents);
-  } catch (error) {
-    console.error("Error reading JSON file:", error);
-    return {};
-  }
-}
-
-async function writeJsonData(data: { [key: string]: any }): Promise<void> {
-  try {
-    await fs.writeFile(DATA_FILE_PATH, JSON.stringify(data, null, 4), 'utf-8');
-  } catch (error) {
-    console.error("Error writing to JSON file:", error);
-  }
-}
+const pool = createPool({
+  connectionString: process.env.POSTGRES_URL || process.env.VERCEL_POSTGRES_URL,
+});
 
 export async function fetchAllMusicCardData(
   pageSize: number,
   page: number
 ): Promise<MusicCardData[]> {
   try {
-    const jsonData = await readJsonData();
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    const musicCardDataArray: MusicCardData[] = [];
+    // Calculate offset for pagination
+    const offset = (page - 1) * pageSize;
 
-    const entries = Object.entries(jsonData);
-    const paginatedEntries = entries.slice(startIndex, endIndex);
+    // Fetch paginated music info
+    const musicInfoResult = await pool.query(
+      `
+      SELECT id, image_url, music_title, original_artist, favorite
+      FROM music_info
+      ORDER BY id
+      LIMIT $1 OFFSET $2
+    `,
+      [pageSize, offset]
+    );
 
-    for (const [music_id, data] of paginatedEntries) {
-      musicCardDataArray.push({
-        music_id: music_id,
-        image_url: data.music_info.image_url,
-        music_title: data.music_info.music_title,
-        original_artist: data.music_info.original_artist,
-        favorite: data.music_info.favorites,
-        tags: data.music_tag,
-      });
-    }
+    // Get music IDs from the current page
+    const musicIds = musicInfoResult.rows.map((row) => row.id);
 
-    return musicCardDataArray;
+    // Fetch tags only for the current page's music
+    const musicTagsResult = await pool.query(
+      `
+      SELECT music_info_id, tag
+      FROM music_tag
+      WHERE music_info_id = ANY($1)
+    `,
+      [musicIds]
+    );
+
+    // Create a map to efficiently group tags by music_info_id
+    const tagsByMusicId: { [key: string]: string[] } = {};
+    musicTagsResult.rows.forEach((row) => {
+      const { music_info_id, tag } = row;
+      if (tagsByMusicId[music_info_id]) {
+        tagsByMusicId[music_info_id].push(tag);
+      } else {
+        tagsByMusicId[music_info_id] = [tag];
+      }
+    });
+
+    // Map the results to MusicCardData
+    const allMusicData: MusicCardData[] = musicInfoResult.rows.map(
+      (musicInfo) => {
+        return {
+          music_id: musicInfo.id,
+          image_url: musicInfo.image_url,
+          music_title: musicInfo.music_title,
+          original_artist: musicInfo.original_artist,
+          favorite: musicInfo.favorite,
+          tags: tagsByMusicId[musicInfo.id] || [],
+        };
+      }
+    );
+
+    return allMusicData;
   } catch (error) {
     console.error("Error fetching music card data:", error);
     return [];
@@ -59,20 +75,33 @@ export async function fetchMusicCardDataByMusicId(
   music_id: string
 ): Promise<MusicCardData | null> {
   try {
-    const jsonData = await readJsonData();
-    const musicData = jsonData[music_id];
+    const musicInfoResult = await pool.query(
+      `
+      SELECT id, image_url, music_title, original_artist, favorite
+      FROM music_info
+      WHERE id = $1
+    `,
+      [music_id]
+    );
 
-    if (!musicData) {
-      return null;
-    }
+    const musicTagsResult = await pool.query(
+      `
+      SELECT music_info_id, tag
+      FROM music_tag
+      WHERE music_info_id = $1
+    `,
+      [music_id]
+    );
+
+    const tags = musicTagsResult.rows.map((row) => row.tag);
 
     const musicCardData: MusicCardData = {
-      music_id: music_id,
-      image_url: musicData.music_info.image_url,
-      music_title: musicData.music_info.music_title,
-      original_artist: musicData.music_info.original_artist,
-      favorite: musicData.music_info.favorites,
-      tags: musicData.music_tag,
+      music_id: musicInfoResult.rows[0].id,
+      image_url: musicInfoResult.rows[0].image_url,
+      music_title: musicInfoResult.rows[0].music_title,
+      original_artist: musicInfoResult.rows[0].original_artist,
+      favorite: musicInfoResult.rows[0].favorite,
+      tags: tags,
     };
 
     return musicCardData;
@@ -84,44 +113,55 @@ export async function fetchMusicCardDataByMusicId(
 
 export async function updateMusicCardDataByMusicId(musicCardData: MusicCardData) {
   try {
-    const jsonData = await readJsonData();
+    // Update music_info table
+    await pool.query(
+      `
+      UPDATE music_info
+      SET music_title = $1, original_artist = $2
+      WHERE id = $3
+      `,
+      [musicCardData.music_title, musicCardData.original_artist, musicCardData.music_id]
+    );
 
-    if (jsonData[musicCardData.music_id]) {
-      jsonData[musicCardData.music_id] = {
-        ...jsonData[musicCardData.music_id],
-        music_info: {
-          ...jsonData[musicCardData.music_id].music_info,
-          music_title: musicCardData.music_title,
-          original_artist: musicCardData.original_artist,
-          favorites: musicCardData.favorite // Assuming 'favorite' maps to 'favorites' in JSON
-        },
-        music_tag: musicCardData.tags,
-      };
-      await writeJsonData(jsonData);
-      return true;
-    } else {
-      console.error(`Music ID ${musicCardData.music_id} not found in JSON data.`);
-      return null;
+    // Update tags (clear existing tags and insert new ones)
+    await pool.query(
+      `
+      DELETE FROM music_tag
+      WHERE music_info_id = $1
+      `,
+      [musicCardData.music_id]
+    );
+
+    for (const tag of musicCardData.tags) {
+      await pool.query(
+        `
+        INSERT INTO music_tag (music_info_id, tag)
+        VALUES ($1, $2)
+        `,
+        [musicCardData.music_id, tag]
+      );
     }
+
+    // Return a truthy value to indicate success
+    return true;
   } catch (error) {
     console.error("Error updating music card data:", error);
     return null;
   }
 }
 
+// export async function deleteMusicCardDataByMusicId(music_id: string) {
+//   await pool.query(`DELETE FROM music_info WHERE id = $1`, [music_id]);
+//   //await pool.query(`DELETE FROM music_tag WHERE music_info_id = $1`, [music_id]);
+// }
+
 export async function deleteMusicCardDataByMusicId(music_id: string) {
-  try {
-    const jsonData = await readJsonData();
-    if (jsonData[music_id]) {
-      delete jsonData[music_id];
-      await writeJsonData(jsonData);
-      return { success: true }; // Return a similar structure to the original SQL response
-    } else {
-      console.warn(`Music ID ${music_id} not found, cannot delete.`);
-      return { success: false, message: `Music ID ${music_id} not found.` };
-    }
-  } catch (error) {
-    console.error("Error deleting music card data:", error);
-    return { success: false, error: error };
-  }
+
+    // Before deleting from music_info, delete any related records in music_tag
+    await pool.query(`DELETE FROM music_tag WHERE music_info_id = $1`, [music_id]);
+
+    const result = await pool.query(`DELETE FROM music_info WHERE id = $1`, [music_id]);
+
+    return result;
+
 }

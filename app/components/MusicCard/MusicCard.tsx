@@ -17,7 +17,6 @@ import ActionButtons from "./ActionButtons";
 import { MusicCardProps } from "./types";
 import dynamic from "next/dynamic";
 
-
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: "#fff",
   ...theme.typography.body2,
@@ -170,12 +169,7 @@ const MusicCard = memo(
       <TagsContainer isMobile={isMobile}>
         {Array.isArray(tags) &&
           tags.map((tag) => (
-            <Chip
-              key={`${music_id}-${tag}`}
-              label={tag}
-              size="small"
-
-            />
+            <Chip key={`${music_id}-${tag}`} label={tag} size="small" />
           ))}
       </TagsContainer>
     );
@@ -191,77 +185,70 @@ const MusicCard = memo(
 
     return (
       <Box component="article" aria-label={`Music: ${music_title}`}>
-        
-          <CardBase isMobile={isMobile}>
+        <CardBase isMobile={isMobile}>
+          <Grid
+            container
+            alignItems="center"
+            spacing={1}
+            direction={isMobile ? "column" : "row"}
+            sx={{ flexGrow: 1 }}
+          >
             <Grid
-              container
+              size={{ xs: 12, md: 3 }}
               alignItems="center"
-              spacing={1}
-              direction={isMobile ? "column" : "row"}
-              sx={{ flexGrow: 1 }}
+              direction="row"
+              container
+              spacing={3}
             >
-              <Grid
-                size={{ xs: 12, md: 3 }}
-                alignItems="center"
-                direction="row"
-                container
-                spacing={3}
-              >
-                <Grid size="auto">
-                  <ImageContainer>
-                    <Image
-                      // src={image_url || '/Untitled-1.png'}
-                      src={'/Untitled-1.png'}
-                      alt={`Cover for ${music_title}`}
-                      width={60}
-                      height={60}
-                      priority={false}
-                      style={{ objectFit: "cover" }}
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        if (target.src !== fallbackImage) {
-                          target.src = fallbackImage;
-                        }
-                      }}
-                    />
-                  </ImageContainer>
-                </Grid>
-                <Grid size="grow">
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ color: theme.palette.primary.main }}
-                    noWrap
-                    component="h3"
-                  >
-                    {music_title}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: theme.palette.secondary.main }}
-                    noWrap
-                  >
-                    {original_artist}
-                  </Typography>
-                </Grid>
+              <Grid size="auto">
+                <ImageContainer>
+                  <Image
+                    // src={image_url || '/Untitled-1.png'}
+                    src={"/Untitled-1.png"}
+                    alt={`Cover for ${music_title}`}
+                    width={60}
+                    height={60}
+                    priority={false}
+                    style={{ objectFit: "cover" }}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      if (target.src !== fallbackImage) {
+                        target.src = fallbackImage;
+                      }
+                    }}
+                  />
+                </ImageContainer>
               </Grid>
+              <Grid size="grow">
+                <Typography
+                  variant="subtitle1"
+                  sx={{ color: theme.palette.primary.main }}
+                  noWrap
+                  component="h3"
+                >
+                  {music_title}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ color: theme.palette.secondary.main }}
+                  noWrap
+                >
+                  {original_artist}
+                </Typography>
+              </Grid>
+            </Grid>
 
-              {/* <Grid size={{ xs: 12, md: "grow" }}>
+            {/* <Grid size={{ xs: 12, md: "grow" }}>
                 <Item>3</Item>
               </Grid>
               <Grid size={{ xs: 12, md: 2 }}>
                 <Item>4</Item>
               </Grid> */}
-              
-                <ResponsiveLayout
-                  tags={renderTags}
-                  actionButtons={actionButtons}
-                />
-              
-            </Grid>
-            <Divider />
-          </CardBase>
-        
-        
+
+            <ResponsiveLayout tags={renderTags} actionButtons={actionButtons} />
+          </Grid>
+        </CardBase>
+        <Divider />
       </Box>
     );
   }
