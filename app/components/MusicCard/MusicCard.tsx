@@ -12,31 +12,31 @@ import {
 } from "@mui/material";
 import Image from "next/image";
 import Grid from "@mui/material/Grid2";
-import { styled } from "@mui/material/styles";
+import { styled, darken } from "@mui/material/styles";
 import ActionButtons from "./ActionButtons";
 import { MusicCardProps } from "./types";
 import dynamic from "next/dynamic";
+import { useSnackbar } from "notistack";
+// const Item = styled(Paper)(({ theme }) => ({
+//   backgroundColor: "#fff",
+//   ...theme.typography.body2,
+//   padding: theme.spacing(1),
+//   textAlign: "center",
+//   color: theme.palette.text.secondary,
+//   ...theme.applyStyles("dark", {
+//     backgroundColor: "#1A2027",
+//   }),
+// }));
 
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: "#fff",
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: "center",
-  color: theme.palette.text.secondary,
-  ...theme.applyStyles("dark", {
-    backgroundColor: "#1A2027",
-  }),
-}));
+// // NoSSR wrapper
+// interface NoSSRProps {
+//   children: React.ReactNode;
+// }
 
-// NoSSR wrapper
-interface NoSSRProps {
-  children: React.ReactNode;
-}
-
-const NoSSR = dynamic<NoSSRProps>(
-  () => Promise.resolve(({ children }: NoSSRProps) => <>{children}</>),
-  { ssr: false }
-);
+// const NoSSR = dynamic<NoSSRProps>(
+//   () => Promise.resolve(({ children }: NoSSRProps) => <>{children}</>),
+//   { ssr: false }
+// );
 
 // Styled Components Types
 interface StyledProps {
@@ -165,6 +165,45 @@ const MusicCard = memo(
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
     const fallbackImage = "/images/fallback-music.jpg";
 
+    const { enqueueSnackbar } = useSnackbar();
+
+    const copyToClipboard = (text: string) => {
+      if (
+        navigator.clipboard &&
+        typeof navigator.clipboard.writeText === "function"
+      ) {
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            console.log(`Copied "${text}" to clipboard!`);
+          })
+          .catch((err) => {
+            console.error("Failed to copy text using clipboard API:", err);
+            fallbackCopyToClipboard(text); // 使用备用方案
+          });
+      } else {
+        fallbackCopyToClipboard(text); // 使用备用方案
+      }
+    };
+
+    const fallbackCopyToClipboard = (text: string) => {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand("copy");
+        console.log(`Fallback: Copied "${text}" to clipboard!`);
+      } catch (err) {
+        console.error("Fallback: Failed to copy text:", err);
+      }
+      document.body.removeChild(textarea);
+    };
+    const handleClickVariant = (text: string) => {
+      // variant could be success, error, warning, info, or default
+      enqueueSnackbar(text, { variant: "success" });
+    };
+
     const renderTags = (
       <TagsContainer isMobile={isMobile}>
         {Array.isArray(tags) &&
@@ -184,7 +223,20 @@ const MusicCard = memo(
     );
 
     return (
-      <Box component="article" aria-label={`Music: ${music_title}`}>
+      <Box
+        component="article"
+        aria-label={`Music: ${music_title}`}
+        role="MusicCard"
+        sx={{
+          "&:hover": {
+            backgroundColor: theme.palette.surface.container,
+          },
+        }}
+        onClick={() => {
+          copyToClipboard("点歌 " + music_title);
+          handleClickVariant("点歌 " + music_title + "   | 已复制到剪贴板");
+        }}
+      >
         <CardBase isMobile={isMobile}>
           <Grid
             container
@@ -237,13 +289,6 @@ const MusicCard = memo(
                 </Typography>
               </Grid>
             </Grid>
-
-            {/* <Grid size={{ xs: 12, md: "grow" }}>
-                <Item>3</Item>
-              </Grid>
-              <Grid size={{ xs: 12, md: 2 }}>
-                <Item>4</Item>
-              </Grid> */}
 
             <ResponsiveLayout tags={renderTags} actionButtons={actionButtons} />
           </Grid>

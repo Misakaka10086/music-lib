@@ -13,9 +13,16 @@ import SearchInput from "@/app/components/SearchInput/SearchInput";
 import { stickySearchStyle } from "@/app/components/SearchInput/searchInput";
 import { MusicCardData } from "@/app/components/MusicCard/types";
 import MusicCard from "@/app/components/MusicCard/MusicCard";
-import { useInView } from "react-intersection-observer";
-import { fetchAllMusicCardData } from "@/app/lib/processMusicCardData";
 import MusicCardSkeleton from "@/app/components/MusicCard/Skeleton";
+
+let fetchAllMusicCardData:any ;
+if (process.env.DevelopMode === 'true') {
+  ({ fetchAllMusicCardData } = await import('@/app/lib/processMusicCardData_dev'));
+} else {
+  ({ fetchAllMusicCardData } = await import('@/app/lib/processMusicCardData'));
+}
+
+// ============================
 
 // 将 MusicCard 列表提取为单独的组件
 const MusicCardList = memo(({ 
@@ -26,9 +33,12 @@ const MusicCardList = memo(({
   onMoreOptions: (id: string) => void 
 }) => {
   return (
-    <Box>
+    <Box 
+    aria-label="MusicCardList"
+    role="MusicCardList"
+    >
       {musicData.map((music) => (
-        <Box key={music.music_id} sx={{ mb: 2 }}>
+        <Box key={music.music_id}>
           <MusicCard
             {...music}
             onDownload={() => console.log(`Download ${music.music_id}`)}

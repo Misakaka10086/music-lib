@@ -13,10 +13,12 @@ import {
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import HomeIcon from "@mui/icons-material/Home";
 import SettingsIcon from "@mui/icons-material/Settings";
+import HandymanIcon from "@mui/icons-material/Handyman";
 import { lightTheme, darkTheme } from "../theme";
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Footer } from "@/app/components/Footer/Footer";
+import { SnackbarProvider } from "notistack";
 
 interface Props {
   children: React.ReactElement;
@@ -61,32 +63,68 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   sx={{ color: theme.palette.primary.onFixed }}
                 />
               </IconButton>
-              <Link href="/home" passHref style={{ textDecoration: "none", WebkitTapHighlightColor: 'transparent' }}>
+              <Link
+                href="/home"
+                passHref
+                style={{
+                  textDecoration: "none",
+                  WebkitTapHighlightColor: "transparent",
+                }}
+              >
                 <IconButton
-                  sx={{ 
+                  sx={{
                     color: theme.palette.primary.onFixed,
-                    WebkitTapHighlightColor: 'transparent',
+                    WebkitTapHighlightColor: "transparent",
                   }}
                 >
                   <HomeIcon />
                 </IconButton>
               </Link>
-              <Link href="/setting" passHref style={{ textDecoration: "none", WebkitTapHighlightColor: 'transparent' }}>
+              <Link
+                href="/setting"
+                passHref
+                style={{
+                  textDecoration: "none",
+                  WebkitTapHighlightColor: "transparent",
+                }}
+              >
                 <IconButton
-                  sx={{ 
+                  sx={{
                     color: theme.palette.primary.onFixed,
-                    WebkitTapHighlightColor: 'transparent',
+                    WebkitTapHighlightColor: "transparent",
                   }}
                 >
                   <SettingsIcon />
                 </IconButton>
               </Link>
+              <Link
+                href="/experiment"
+                passHref
+                style={{
+                  textDecoration: "none",
+                  WebkitTapHighlightColor: "transparent",
+                }}
+              >
+                <IconButton
+                  sx={{
+                    color: theme.palette.primary.onFixed,
+                    WebkitTapHighlightColor: "transparent",
+                  }}
+                >
+                  <HandymanIcon />
+                </IconButton>
+              </Link>
             </Toolbar>
           </AppBar>
         </HideOnScroll>
-        <Container component="main" sx={{ pt: 10 }}>
-          {children}
-        </Container>
+        <SnackbarProvider
+          maxSnack={3}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Container component="main" sx={{ pt: 10 }}>
+            {children}
+          </Container>
+        </SnackbarProvider>
         <Footer />
       </Box>
     </ThemeProvider>

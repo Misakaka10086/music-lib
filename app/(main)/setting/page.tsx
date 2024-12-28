@@ -3,9 +3,22 @@ import { Box, Container, CircularProgress } from "@mui/material";
 import { useEffect, useState, useCallback, useRef, Suspense, useMemo, memo } from "react";
 import { MusicCardData } from "@/app/components/MusicCard/types";
 import MusicCardSkeleton from "@/app/components/MusicCard/Skeleton";
-import { fetchAllMusicCardData } from "@/app/lib/processMusicCardData";
+
 import MusicCard from "@/app/components/MusicCard/MusicCard";
 import dynamic from "next/dynamic";
+
+let fetchAllMusicCardData:any ;
+
+if (process.env.DevelopMode === 'true') {
+  ({ fetchAllMusicCardData } = await import('@/app/lib/processMusicCardData_dev'));
+} else {
+  ({ fetchAllMusicCardData } = await import('@/app/lib/processMusicCardData'));
+}
+
+
+
+
+
 
 // 定义 EditMusicCard 组件的类型
 type EditMusicCardType = React.ComponentType<{
