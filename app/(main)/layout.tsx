@@ -9,6 +9,7 @@ import {
   Container,
   Slide,
   useScrollTrigger,
+  Zoom,
 } from "@mui/material";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import HomeIcon from "@mui/icons-material/Home";
@@ -19,6 +20,9 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Footer } from "@/app/components/Footer/Footer";
 import { SnackbarProvider } from "notistack";
+import Fab from "@mui/material/Fab";
+import { BilibiliOutlined } from "@ant-design/icons";
+import Tooltip from "@mui/material/Tooltip";
 
 interface Props {
   children: React.ReactElement;
@@ -41,6 +45,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     [isDarkMode]
   );
 
+  const handleOpenBilibili = () => {
+    // 深度链接打开 YouTube 应用
+    const bilibiliDeepLink = "bilibili://live/27257241"; // 如果未安装会失败
+    const bilibiliWebFallback = "https://live.bilibili.com/27257241";
+
+    // 尝试打开深度链接，若失败则跳转到网页
+    window.location.href = bilibiliDeepLink;
+
+    // 备选方案：在一定延迟后跳转到 Web 页面
+    setTimeout(() => {
+      window.location.href = bilibiliWebFallback;
+    }, 3000);
+  };
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -117,6 +134,27 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </Toolbar>
           </AppBar>
         </HideOnScroll>
+        <Box
+          sx={{
+            position: "fixed",
+            bottom: 16,
+            right: 16,
+            "& > :not(style)": { m: 1 },
+            zIndex: 1000,
+          }}
+        >
+          <Tooltip
+            title="去直播间"
+            placement="left"
+            slots={{
+              transition: Zoom,
+            }}
+          >
+            <Fab color="primary" aria-label="add" onClick={handleOpenBilibili}>
+              <BilibiliOutlined style={{ fontSize: 32 }} />
+            </Fab>
+          </Tooltip>
+        </Box>
         <SnackbarProvider
           maxSnack={3}
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}

@@ -304,6 +304,24 @@ export const lightTheme = createTheme({
         },
       },
     },
+  MuiTooltip: {
+    styleOverrides: {
+      tooltip: {
+        backgroundColor: lightColors.surfaceContainerHigh,
+        color: lightColors.onSurface,
+        fontSize: '1rem',
+        borderRadius: '4px',
+        padding: '8px 12px',
+        boxShadow: `0px 2px 4px ${lightColors.shadow}`,
+      },
+      arrow: {
+        color: lightColors.surfaceContainerHigh,
+      },
+      popper: {
+        zIndex: 1500,
+      },
+    },
+  },
   },
 });
 
@@ -502,6 +520,24 @@ export const darkTheme = createTheme({
           "&::after": {
             background: `linear-gradient(90deg, transparent, ${darkColors.surfaceContainerHigh}, transparent)`,
           },
+        },
+      },
+    },
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          backgroundColor: darkColors.surfaceContainerHigh,
+          color: darkColors.onSurface,
+          fontSize: '1rem',
+          borderRadius: '4px',
+          padding: '8px 12px',
+          boxShadow: `0px 2px 4px ${darkColors.shadow}`,
+        },
+        arrow: {
+          color: darkColors.surfaceContainerHigh,
+        },
+        popper: {
+          zIndex: 1500,
         },
       },
     },
