@@ -24,7 +24,7 @@ import Fab from "@mui/material/Fab";
 import { BilibiliOutlined } from "@ant-design/icons";
 import Tooltip from "@mui/material/Tooltip";
 import { useUser } from '@auth0/nextjs-auth0/client';
-
+import "@fontsource/zcool-kuaile";
 
 interface Props {
   children: React.ReactElement;

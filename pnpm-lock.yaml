@@ -23,6 +23,9 @@ importers:
       '@fontsource/italianno':
         specifier: ^5.1.0
         version: 5.1.0
+      '@fontsource/zcool-kuaile':
+        specifier: ^5.1.1
+        version: 5.1.1
       '@mui/icons-material':
         specifier: ^6.3.0
         version: 6.3.0(@mui/material@6.3.0(@emotion/react@11.14.0(@types/react@19.0.2)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.2)(react@19.0.0))(@types/react@19.0.2)(react@19.0.0))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@19.0.2)(react@19.0.0)
@@ -195,6 +198,9 @@ packages:
 
   '@fontsource/italianno@5.1.0':
     resolution: {integrity: sha512-AMAXDrsr0BMg6bO5ianBNNqT2zsQaXQ9x1eyIHIGigj49EbY+FhnUK/u+Pf0/MaiVgAhDBo2r/dDDoojDypMwQ==}
+
+  '@fontsource/zcool-kuaile@5.1.1':
+    resolution: {integrity: sha512-49nFTlb0C1pXcQzASZDvRIZ991U8TNIYYNVN6ybn5UHq17IOKv7Vngw1nhL7MMkdRwTx+pkDsUbMt2DCdu66PA==}
 
   '@hapi/hoek@9.3.0':
     resolution: {integrity: sha512-/c6rf4UJlmHlC9b5BaNvzAcFv7HZ2QHaV0D4/HNlBdvFnvQq8RI4kYdhyPCl7Xj+oWvTWQ8ujhqS53LIgAe6KQ==}
@@ -1265,6 +1271,8 @@ snapshots:
   '@emotion/weak-memoize@0.4.0': {}
 
   '@fontsource/italianno@5.1.0': {}
+
+  '@fontsource/zcool-kuaile@5.1.1': {}
 
   '@hapi/hoek@9.3.0': {}
 
