@@ -1,116 +1,84 @@
 "use client";
-import {
-  Paper,
-  Button,
-  Box,
-  Container,
-  Stack,
-  useScrollTrigger,
-} from "@mui/material";
-import { useState, useMemo, useCallback, useEffect, memo } from "react";
-import { buttonStyles } from "@/app/styles/buttonStyles";
-import SearchInput from "@/app/components/SearchInput/SearchInput";
-import { stickySearchStyle } from "@/app/components/SearchInput/searchInput";
+
+import { Box } from "@mui/material";
+import TableSkeleton from "@/app/components/ui/TableSkeleton";
+import Search from "@/app/components/ui/search";
+import { useState, useEffect } from "react";
+import { fetchAllMusicCardData } from "@/app/lib/processMusicCardData";
 import { MusicCardData } from "@/app/components/MusicCard/types";
-import MusicCard from "@/app/components/MusicCard/MusicCard";
-import MusicCardSkeleton from "@/app/components/MusicCard/Skeleton";
+import MusicTable from "@/app/components/ui/MusicTable";
+import MusicCard from "@/app/components/ui/MusicCard";
+import { useDebouncedCallback } from "use-debounce";
+import { useMediaQuery, useTheme } from "@mui/material";
 
-let fetchAllMusicCardData:any ;
-if (process.env.DevelopMode === 'true') {
-  ({ fetchAllMusicCardData } = await import('@/app/lib/processMusicCardData_dev'));
-} else {
-  ({ fetchAllMusicCardData } = await import('@/app/lib/processMusicCardData'));
-}
-
-// ============================
-
-// 将 MusicCard 列表提取为单独的组件
-const MusicCardList = memo(({ 
-  musicData, 
-  onMoreOptions 
-}: { 
-  musicData: MusicCardData[],
-  onMoreOptions: (id: string) => void 
-}) => {
-  return (
-    <Box 
-    aria-label="MusicCardList"
-    role="MusicCardList"
-    >
-      {musicData.map((music) => (
-        <Box key={music.music_id}>
-          <MusicCard
-            {...music}
-            onDownload={() => console.log(`Download ${music.music_id}`)}
-            onFavorite={() => console.log(`Favorite ${music.music_id}`)}
-            onMoreOptions={() => onMoreOptions(music.music_id)}
-          />
-        </Box>
-      ))}
-    </Box>
-  );
-});
-
-MusicCardList.displayName = 'MusicCardList';
-
-export default function Home() {
-  const trigger = useScrollTrigger();
-  const [musicData, setMusicData] = useState<MusicCardData[]>([]);
+export default function Page() {
+  const [query, setQuery] = useState("");
+  const [allMusicData, setAllMusicData] = useState<MusicCardData[]>([]);
+  const [filteredData, setFilteredData] = useState<MusicCardData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const buttonTop = useMemo(() => {
-    return trigger ? 10 : 74; // 74 = AppBar height (64) + 10
-  }, [trigger]);
+  const [mounted, setMounted] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // md breakpoint or smaller
 
-    // Initial data loading
-    useEffect(() => {
-      const fetchData = async () => {
-        const startTime = performance.now();
-        try {
-          setLoading(true);
-          const data = await fetchAllMusicCardData(Number.MAX_SAFE_INTEGER, 1);
-          setMusicData(data);
-        } catch (err) {
-          setError("Failed to load music data");
-          console.error("Error loading music data:", err);
-        } finally {
-          setLoading(false);
-          console.log('Initial data loading took:', performance.now() - startTime, 'ms');
-        }
-      };
-  
-      fetchData();
-    }, []);
+  // Handle mounting state
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Fetch all music data once when component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await fetchAllMusicCardData(Number.MAX_SAFE_INTEGER, 1);
+        setAllMusicData(data);
+        setFilteredData(data);
+      } catch (error) {
+        console.error("Error fetching music data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // Debounced search handler
+  const handleSearch = useDebouncedCallback((searchQuery: string) => {
+    setQuery(searchQuery);
+    if (!searchQuery.trim()) {
+      setFilteredData(allMusicData);
+      return;
+    }
+    const lowercaseQuery = searchQuery.toLowerCase();
+    const filtered = allMusicData.filter((music) => {
+      const title = music.music_title?.toLowerCase() || "";
+      const artist = music.original_artist?.toLowerCase() || "";
+      const tags = music.tags?.map((tag) => tag?.toLowerCase() || "") || [];
+
+      return (
+        title.includes(lowercaseQuery) ||
+        artist.includes(lowercaseQuery) ||
+        tags.some((tag) => tag.includes(lowercaseQuery))
+      );
+    });
+    setFilteredData(filtered);
+  }, 200);
+
+  if (!mounted) {
+    return null;
+  }
+
+  if (loading) {
+    return <TableSkeleton />;
+  }
 
   return (
-    <Container
-      sx={{
-        justifyContent: "center",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <Box
-        sx={{
-          ...stickySearchStyle(buttonTop),
-          transition: "top 0.3s",
-          borderRadius: "1000px",
-        }}
-      >
-        <SearchInput />
-      </Box>
-      <Box sx={{ p: 2, minHeight:'100vh'}}>
-        {loading ? (
-          Array.from({ length: 10 }).map((_, index) => (
-            <MusicCardSkeleton key={index} />
-          ))
-        ) : (
-          <MusicCardList 
-            musicData={musicData}
-            onMoreOptions={() => console.log('More options')}
-          />
-        )}
-      </Box>
-    </Container>
+    <Box sx={{ p: 1 }}>
+      <Search placeholder="Search for music" onSearch={handleSearch} />
+      {isMobile ? (
+        <MusicCard data={filteredData} />
+      ) : (
+        <MusicTable data={filteredData} />
+      )}
+    </Box>
   );
 }

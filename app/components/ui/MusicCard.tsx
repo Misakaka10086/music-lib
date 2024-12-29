@@ -9,15 +9,11 @@ import {
 } from "@mui/material";
 import { fetchAllMusicCardData, fetchFilteredMusicCardData } from "@/app/lib/processMusicCardData";
 import TestSkeleton from "@/app/components/ui/skeleton";
-import CopyToClipboardButton from "@/app/components/ui/copyToClipboardButton";
+import { MusicCardData } from "@/app/components/MusicCard/types";
+import { useCopyToClipboard } from "@/app/components/ui/copyToClipboard";
 
-export default async function MusicCard({
-  query,
-}: {
-  query: string;
-}) {
-
-  const musicData = await fetchFilteredMusicCardData(query);
+export default function MusicCard({ data }: { data: MusicCardData[] }) {
+  const copyToClipboard = useCopyToClipboard();
 
   return (
       <Box
@@ -28,9 +24,11 @@ export default async function MusicCard({
           gap: 2,
         }}
       >
-        {musicData.map((music) => (
-          <CopyToClipboardButton key={music.music_id} textToCopy={music.music_title}>
-            <Card sx={{ display: "flex"}}>
+        {data.map((music) => (
+
+            <Card sx={{ display: "flex"}} onClick={() => {
+              copyToClipboard(music.music_title);
+            }}>
               <CardMedia
                 component="img"
                 sx={{
@@ -61,7 +59,7 @@ export default async function MusicCard({
                 </CardContent>
               </Box>
             </Card>
-          </CopyToClipboardButton>
+
         ))}
       </Box>
   );

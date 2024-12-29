@@ -23,7 +23,7 @@ import { SnackbarProvider } from "notistack";
 import Fab from "@mui/material/Fab";
 import { BilibiliOutlined } from "@ant-design/icons";
 import Tooltip from "@mui/material/Tooltip";
-import "@fontsource/zcool-kuaile";
+
 
 interface Props {
   children: React.ReactElement;

@@ -1,40 +1,74 @@
 'use client';
 
-import { TextField } from '@mui/material';
-import { useSearchParams, usePathname, useRouter } from 'next/navigation';
-import { useDebouncedCallback } from 'use-debounce';
+import { Box, TextField, InputAdornment, IconButton } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useState, useRef, ChangeEvent } from "react";
 
-export default function Search({ placeholder }: { placeholder: string }) {
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const { replace } = useRouter();
+interface SearchProps {
+  placeholder: string;
+  onSearch?: (query: string) => void;
+}
 
-  const handleSearch = useDebouncedCallback((term) => {
-    console.log(`Searching... ${term}`);
-    const params = new URLSearchParams(searchParams);
-    if (term) {
-      params.set('query', term);
-    } else {
-      params.delete('query');
-    }
-    replace(`${pathname}?${params.toString()}`);
-  }, 300);
+export default function Search({ placeholder, onSearch }: SearchProps) {
+  const [inputValue, setInputValue] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+    onSearch?.(value);
+  };
+
+  const handleClear = () => {
+    setInputValue("");
+    onSearch?.("");
+    inputRef.current?.focus();
+  };
 
   return (
-    <div >
-      <TextField
-        fullWidth
-        label={placeholder}
-        variant="outlined"
-        onChange={(e) => handleSearch(e.target.value)}
-        sx={{ 
-          mb: 2,
-          '& .MuiOutlinedInput-root': {
-            borderRadius: '100px'
-          }
+    <Box
+      component="div"
+      role="search"
+      aria-label="Search songs"
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        mb: 2,
+      }}
+    >
+      <Box
+        sx={{
+          position: "relative",
+          width: "100%",
+          maxWidth: "600px",
         }}
-      />
-    </div>
+      >
+        <TextField
+          inputRef={inputRef}
+          fullWidth
+          placeholder={placeholder}
+          value={inputValue}
+          onChange={handleChange}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+              endAdornment: inputValue && (
+                <InputAdornment position="end">
+                  <IconButton onClick={handleClear} size="small">
+                    <DeleteIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+      </Box>
+    </Box>
   );
 }
