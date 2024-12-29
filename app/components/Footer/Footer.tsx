@@ -39,7 +39,7 @@ export const Footer = () => {
               variant="body2"
               color="primary.main"
               fontFamily="Italianno"
-              fontSize="2rem"
+              fontSize="2.5rem"
             >
               TangYuXiaoBao i
             </Typography>

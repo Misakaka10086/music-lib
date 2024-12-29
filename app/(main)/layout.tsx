@@ -23,6 +23,7 @@ import { SnackbarProvider } from "notistack";
 import Fab from "@mui/material/Fab";
 import { BilibiliOutlined } from "@ant-design/icons";
 import Tooltip from "@mui/material/Tooltip";
+import "@fontsource/zcool-kuaile";
 
 interface Props {
   children: React.ReactElement;
@@ -63,6 +64,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <Box
         sx={{
           bgcolor: theme.palette.md3_other.background,
+          minHeight: "100vh",
+          display: "flex", // 使用 Flexbox 布局
+          flexDirection: "column", // 纵向排列内容
         }}
       >
         <HideOnScroll>
@@ -155,6 +159,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </Fab>
           </Tooltip>
         </Box>
+
         <SnackbarProvider
           maxSnack={3}
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
@@ -163,6 +168,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             {children}
           </Container>
         </SnackbarProvider>
+
         <Footer />
       </Box>
     </ThemeProvider>

@@ -165,3 +165,69 @@ export async function deleteMusicCardDataByMusicId(music_id: string) {
     return result;
 
 }
+
+
+export async function fetchFilteredMusicCardData(
+  query: string,
+): Promise<MusicCardData[]> {
+  try {
+    // Fetch music info that matches title, artist or tags
+    const musicInfoResult = await pool.query(
+      `
+      SELECT mi.id, mi.image_url, mi.music_title, mi.original_artist, mi.favorite
+      FROM music_info mi
+      LEFT JOIN music_tag mt ON mi.id = mt.music_info_id
+      WHERE 
+        mi.music_title ILIKE $1 OR 
+        mi.original_artist ILIKE $1 OR
+        mt.tag ILIKE $1
+      GROUP BY mi.id
+      ORDER BY mi.id
+    `,
+      [`%${query}%`]
+    );
+
+    // Get music IDs from the results
+    const musicIds = musicInfoResult.rows.map((row) => row.id);
+
+    // Fetch tags only for the matched music
+    const musicTagsResult = await pool.query(
+      `
+      SELECT music_info_id, tag
+      FROM music_tag
+      WHERE music_info_id = ANY($1)
+    `,
+      [musicIds]
+    );
+
+    // Create a map to efficiently group tags by music_info_id
+    const tagsByMusicId: { [key: string]: string[] } = {};
+    musicTagsResult.rows.forEach((row) => {
+      const { music_info_id, tag } = row;
+      if (tagsByMusicId[music_info_id]) {
+        tagsByMusicId[music_info_id].push(tag);
+      } else {
+        tagsByMusicId[music_info_id] = [tag];
+      }
+    });
+
+    // Map the results to MusicCardData
+    const allMusicData: MusicCardData[] = musicInfoResult.rows.map(
+      (musicInfo) => {
+        return {
+          music_id: musicInfo.id,
+          image_url: musicInfo.image_url,
+          music_title: musicInfo.music_title,
+          original_artist: musicInfo.original_artist,
+          favorite: musicInfo.favorite,
+          tags: tagsByMusicId[musicInfo.id] || [],
+        };
+      }
+    );
+
+    return allMusicData;
+  } catch (error) {
+    console.error("Error fetching music card data:", error);
+    return [];
+  }
+}

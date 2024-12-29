@@ -183,7 +183,9 @@ export const lightTheme = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
+          fontFamily: "'ZCOOL KuaiLe', Arial, sans-serif",
           "& .MuiInputBase-root": {
+            fontFamily: "'ZCOOL KuaiLe', Arial, sans-serif",
             color: lightColors.primary,
             "&:before": {
               borderBottomColor: lightColors.primary,
@@ -196,9 +198,21 @@ export const lightTheme = createTheme({
             },
           },
           "& .MuiInputLabel-root": {
+            fontFamily: "'ZCOOL KuaiLe', Arial, sans-serif",
             color: lightColors.primary,
             "&.Mui-focused": {
               color: lightColors.primary,
+            },
+          },
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: lightColors.primary, // 未激活状态的颜色
+            },
+            '&:hover fieldset': {
+              borderColor: lightColors.primary, // 悬停状态的颜色
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: lightColors.primary, // 激活状态的颜色
             },
           },
         },
@@ -207,6 +221,7 @@ export const lightTheme = createTheme({
     MuiChip: {
       styleOverrides: {
         root: {
+          fontFamily: "'ZCOOL KuaiLe', Arial, sans-serif",
           backgroundColor: lightColors.surfaceContainer,
           color: lightColors.onSurface,
           "&.MuiChip-filled": {
@@ -220,6 +235,9 @@ export const lightTheme = createTheme({
           "&.Mui-disabled": {
             opacity: 0.38,
           },
+        },
+        label: {
+          fontFamily: "'ZCOOL KuaiLe', Arial, sans-serif",
         },
         deleteIcon: {
           color: lightColors.onSurfaceVariant,
@@ -304,24 +322,43 @@ export const lightTheme = createTheme({
         },
       },
     },
-  MuiTooltip: {
-    styleOverrides: {
-      tooltip: {
-        backgroundColor: lightColors.surfaceContainerHigh,
-        color: lightColors.onSurface,
-        fontSize: '1rem',
-        borderRadius: '4px',
-        padding: '8px 12px',
-        boxShadow: `0px 2px 4px ${lightColors.shadow}`,
-      },
-      arrow: {
-        color: lightColors.surfaceContainerHigh,
-      },
-      popper: {
-        zIndex: 1500,
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          fontFamily: "'ZCOOL KuaiLe', Arial, sans-serif",
+          backgroundColor: lightColors.surfaceContainerHigh,
+          color: lightColors.onSurface,
+          fontSize: '1rem',
+          borderRadius: '4px',
+          padding: '8px 12px',
+          boxShadow: `0px 2px 4px ${lightColors.shadow}`,
+        },
+        arrow: {
+          color: lightColors.surfaceContainerHigh,
+        },
+        popper: {
+          zIndex: 1500,
+        },
       },
     },
-  },
+    MuiTypography: {
+      styleOverrides: {
+        root: {
+          fontFamily: "'ZCOOL KuaiLe', Arial, sans-serif",
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backgroundColor: lightColors.surfaceContainer,
+          color: lightColors.onSurface,
+          boxShadow: `0px 2px 4px ${lightColors.shadow}`,
+          borderRadius: "12px", // 可选：设置卡片圆角
+          padding: "16px",     // 可选：设置默认内边距
+        },
+      },
+    },
   },
 });
 
@@ -402,7 +439,9 @@ export const darkTheme = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
+          fontFamily: "'ZCOOL KuaiLe', Arial, sans-serif",
           "& .MuiInputBase-root": {
+            fontFamily: "'ZCOOL KuaiLe', Arial, sans-serif",
             color: darkColors.primary,
             "&:before": {
               borderBottomColor: darkColors.primary,
@@ -415,9 +454,21 @@ export const darkTheme = createTheme({
             },
           },
           "& .MuiInputLabel-root": {
+            fontFamily: "'ZCOOL KuaiLe', Arial, sans-serif",
             color: darkColors.primary,
             "&.Mui-focused": {
               color: darkColors.primary,
+            },
+          },
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: darkColors.primary, // 未激活状态的颜色
+            },
+            '&:hover fieldset': {
+              borderColor: darkColors.primary, // 悬停状态的颜色
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: darkColors.primary, // 激活状态的颜色
             },
           },
         },
@@ -426,6 +477,7 @@ export const darkTheme = createTheme({
     MuiChip: {
       styleOverrides: {
         root: {
+          fontFamily: "'ZCOOL KuaiLe', Arial, sans-serif",
           backgroundColor: darkColors.surfaceContainer,
           color: darkColors.onSurface,
           "&.MuiChip-filled": {
@@ -439,6 +491,9 @@ export const darkTheme = createTheme({
           "&.Mui-disabled": {
             opacity: 0.38,
           },
+        },
+        label: {
+          fontFamily: "'ZCOOL KuaiLe', Arial, sans-serif",
         },
         deleteIcon: {
           color: darkColors.onSurfaceVariant,
@@ -526,6 +581,7 @@ export const darkTheme = createTheme({
     MuiTooltip: {
       styleOverrides: {
         tooltip: {
+          fontFamily: "'ZCOOL KuaiLe', Arial, sans-serif",
           backgroundColor: darkColors.surfaceContainerHigh,
           color: darkColors.onSurface,
           fontSize: '1rem',
@@ -538,6 +594,24 @@ export const darkTheme = createTheme({
         },
         popper: {
           zIndex: 1500,
+        },
+      },
+    },
+    MuiTypography: {
+      styleOverrides: {
+        root: {
+          fontFamily: "'ZCOOL KuaiLe', Arial, sans-serif",
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backgroundColor: darkColors.surfaceContainer,
+          color: darkColors.onSecondaryContainer,
+          boxShadow: `0px 2px 4px ${darkColors.shadow}`,
+          borderRadius: "12px", // 可选：设置卡片圆角
+          padding: "16px",     // 可选：设置默认内边距
         },
       },
     },
