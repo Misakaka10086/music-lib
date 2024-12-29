@@ -65,6 +65,10 @@ export default function Search({ placeholder, onSearch }: SearchProps) {
                   </IconButton>
                 </InputAdornment>
               ),
+              type: "text",
+              inputMode: "text",
+              autoComplete: "off",
+              role: "textbox",
             },
           }}
         />

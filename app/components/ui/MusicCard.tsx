@@ -44,7 +44,7 @@ export default function MusicCard({ data }: { data: MusicCardData[] }) {
               objectFit: "cover",
               alignSelf: "center",
             }}
-            image="/Untitled-1.png"
+            image={music.image_url}
             alt={music.music_title}
           />
           <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
