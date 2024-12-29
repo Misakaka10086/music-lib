@@ -23,6 +23,7 @@ import { SnackbarProvider } from "notistack";
 import Fab from "@mui/material/Fab";
 import { BilibiliOutlined } from "@ant-design/icons";
 import Tooltip from "@mui/material/Tooltip";
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 
 interface Props {
@@ -40,6 +41,7 @@ export function HideOnScroll(props: Props) {
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const { user, isLoading } = useUser();
   const [isDarkMode, setIsDarkMode] = useState(true);
   const theme = useMemo(
     () => (isDarkMode ? darkTheme : lightTheme),
@@ -84,57 +86,61 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   sx={{ color: theme.palette.primary.onFixed }}
                 />
               </IconButton>
-              <Link
-                href="/home"
-                passHref
-                style={{
-                  textDecoration: "none",
-                  WebkitTapHighlightColor: "transparent",
-                }}
-              >
-                <IconButton
-                  sx={{
-                    color: theme.palette.primary.onFixed,
-                    WebkitTapHighlightColor: "transparent",
-                  }}
-                >
-                  <HomeIcon />
-                </IconButton>
-              </Link>
-              <Link
-                href="/setting"
-                passHref
-                style={{
-                  textDecoration: "none",
-                  WebkitTapHighlightColor: "transparent",
-                }}
-              >
-                <IconButton
-                  sx={{
-                    color: theme.palette.primary.onFixed,
-                    WebkitTapHighlightColor: "transparent",
-                  }}
-                >
-                  <SettingsIcon />
-                </IconButton>
-              </Link>
-              <Link
-                href="/experiment"
-                passHref
-                style={{
-                  textDecoration: "none",
-                  WebkitTapHighlightColor: "transparent",
-                }}
-              >
-                <IconButton
-                  sx={{
-                    color: theme.palette.primary.onFixed,
-                    WebkitTapHighlightColor: "transparent",
-                  }}
-                >
-                  <HandymanIcon />
-                </IconButton>
-              </Link>
+              {user && (
+                <>
+                  <Link
+                    href="/home"
+                    passHref
+                    style={{
+                      textDecoration: "none",
+                      WebkitTapHighlightColor: "transparent",
+                    }}
+                  >
+                    <IconButton
+                      sx={{
+                        color: theme.palette.primary.onFixed,
+                        WebkitTapHighlightColor: "transparent",
+                      }}
+                    >
+                      <HomeIcon />
+                    </IconButton>
+                  </Link>
+                  <Link
+                    href="/setting"
+                    passHref
+                    style={{
+                      textDecoration: "none",
+                      WebkitTapHighlightColor: "transparent",
+                    }}
+                  >
+                    <IconButton
+                      sx={{
+                        color: theme.palette.primary.onFixed,
+                        WebkitTapHighlightColor: "transparent",
+                      }}
+                    >
+                      <SettingsIcon />
+                    </IconButton>
+                  </Link>
+                  <Link
+                    href="/experiment"
+                    passHref
+                    style={{
+                      textDecoration: "none",
+                      WebkitTapHighlightColor: "transparent",
+                    }}
+                  >
+                    <IconButton
+                      sx={{
+                        color: theme.palette.primary.onFixed,
+                        WebkitTapHighlightColor: "transparent",
+                      }}
+                    >
+                      <HandymanIcon />
+                    </IconButton>
+                  </Link>
+                </>
+              )}
             </Toolbar>
           </AppBar>
         </HideOnScroll>
