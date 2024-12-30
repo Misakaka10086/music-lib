@@ -294,15 +294,12 @@ export const lightTheme = createTheme({
     MuiDivider: {
       styleOverrides: {
         root: {
-          borderColor: lightColors.outlineVariant,
-          "&.MuiDivider-vertical": {
-            borderColor: lightColors.outlineVariant,
+          borderColor: lightColors.primary,
+          '& .MuiDivider-wrapper': {
+            color: lightColors.primary,
           },
-          "&.MuiDivider-middle": {
-            borderColor: lightColors.outlineVariant,
-          },
-          "&.MuiDivider-light": {
-            borderColor: `${lightColors.outlineVariant}3D`, // 24% opacity
+          '&::before, &::after': {
+            borderColor: lightColors.primary,
           },
         },
       },
@@ -550,15 +547,12 @@ export const darkTheme = createTheme({
     MuiDivider: {
       styleOverrides: {
         root: {
-          borderColor: darkColors.outlineVariant,
-          "&.MuiDivider-vertical": {
-            borderColor: darkColors.outlineVariant,
+          borderColor: darkColors.primary,
+          '& .MuiDivider-wrapper': {
+            color: darkColors.primary,
           },
-          "&.MuiDivider-middle": {
-            borderColor: darkColors.outlineVariant,
-          },
-          "&.MuiDivider-light": {
-            borderColor: `${darkColors.outlineVariant}3D`, // 24% opacity
+          '&::before, &::after': {
+            borderColor: darkColors.primary,
           },
         },
       },

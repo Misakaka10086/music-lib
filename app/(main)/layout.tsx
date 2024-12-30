@@ -23,7 +23,7 @@ import { SnackbarProvider } from "notistack";
 import Fab from "@mui/material/Fab";
 import { BilibiliOutlined } from "@ant-design/icons";
 import Tooltip from "@mui/material/Tooltip";
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from "@auth0/nextjs-auth0/client";
 import "@fontsource/zcool-kuaile";
 
 interface Props {
@@ -46,9 +46,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   // 初始化时从本地存储读取主题设置
   useEffect(() => {
-    const savedTheme = localStorage.getItem('themeMode');
+    const savedTheme = localStorage.getItem("themeMode");
     if (savedTheme) {
-      setIsDarkMode(savedTheme === 'dark');
+      setIsDarkMode(savedTheme === "dark");
     }
   }, []);
 
@@ -56,7 +56,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const toggleTheme = () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
-    localStorage.setItem('themeMode', newMode ? 'dark' : 'light');
+    localStorage.setItem("themeMode", newMode ? "dark" : "light");
   };
 
   const theme = useMemo(
@@ -94,10 +94,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             }}
           >
             <Toolbar>
-              <IconButton
-                onClick={toggleTheme}
-                aria-label="Toggle dark mode"
-              >
+              <IconButton onClick={toggleTheme} aria-label="Toggle dark mode">
                 <Brightness4Icon
                   sx={{ color: theme.palette.primary.onFixed }}
                 />

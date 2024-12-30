@@ -231,3 +231,8 @@ export async function fetchFilteredMusicCardData(
     return [];
   }
 }
+
+export async function fetchAllTags() {
+  const tagsResult = await pool.query(`SELECT DISTINCT tag FROM music_tag`);
+  return tagsResult.rows.map((row) => row.tag);
+}
