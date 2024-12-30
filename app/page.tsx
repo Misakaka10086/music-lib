@@ -37,7 +37,7 @@ export default function Home() {
           color: "black",
         }}
       >
-        进入点歌台
+        进入选歌台
       </Button>
     </Box>
   );

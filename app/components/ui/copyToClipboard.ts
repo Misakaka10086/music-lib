@@ -1,9 +1,9 @@
 "use client";
-
 import { useSnackbar } from "notistack";
 
-export const fallbackCopyToClipboard = (text: string) => {
+const fallbackCopyToClipboard = (text: string) => {
   const textarea = document.createElement("textarea");
+
   textarea.value = text;
   document.body.appendChild(textarea);
   textarea.select();
@@ -21,21 +21,17 @@ export const useCopyToClipboard = () => {
 
   const copyToClipboard = async (textToCopy: string) => {
     textToCopy = "点歌 " + textToCopy;
-    
-    if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
-      try {
-        await navigator.clipboard.writeText(textToCopy);
-        console.log(`Copied "${textToCopy}" to clipboard!`);
-      } catch (err) {
-        console.error("Failed to copy text using clipboard API:", err);
-        fallbackCopyToClipboard(textToCopy);
-      }
-    } else {
-      fallbackCopyToClipboard(textToCopy);
-    }
-    
-    enqueueSnackbar(textToCopy + "   | 已复制到剪贴板", { variant: "success" });
-  };
 
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      console.log(`Copied "${textToCopy}" to clipboard!`);
+      enqueueSnackbar(textToCopy + "   | 已复制到剪贴板", { variant: "success" });
+    } catch (err) {
+      console.error("Failed to copy text using clipboard API:", err);
+      fallbackCopyToClipboard(textToCopy);
+      enqueueSnackbar(textToCopy + "   | 复制到剪贴板了", { variant: "success" });
+    }
+
+  };
   return copyToClipboard;
 };
