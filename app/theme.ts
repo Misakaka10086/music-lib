@@ -310,7 +310,7 @@ export const lightTheme = createTheme({
     MuiSkeleton: {
       styleOverrides: {
         root: {
-          backgroundColor: lightColors.surfaceContainer,
+          backgroundColor: lightColors.surfaceContainerHigh,
         },
         rectangular: {
           borderRadius: "4px",
@@ -566,7 +566,7 @@ export const darkTheme = createTheme({
     MuiSkeleton: {
       styleOverrides: {
         root: {
-          backgroundColor: darkColors.surfaceContainer,
+          backgroundColor: darkColors.surfaceContainerHigh,
         },
         rectangular: {
           borderRadius: "4px",

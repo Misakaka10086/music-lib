@@ -16,6 +16,7 @@ import { MusicCardData } from "@/app/components/MusicCard/types";
 import { useCopyToClipboard } from "@/app/components/ui/copyToClipboard";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
+import CardSkeleton from "./CardSkeleton";
 
 export default function MusicCard() {
   const [allMusicData, setAllMusicData] = useState<MusicCardData[]>([]);
@@ -63,7 +64,7 @@ export default function MusicCard() {
   }, [searchParams, allMusicData]);
 
   if (loading) {
-    return <TableSkeleton />;
+    return <CardSkeleton />;
   }
 
   return (
