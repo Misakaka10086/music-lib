@@ -21,19 +21,22 @@ export default function MusicCard({ data }: { data: MusicCardData[] }) {
   return (
     <Box
       sx={{
-        p: 2,
         display: "grid",
         gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-        gap: 2,
+        gap: 1,
       }}
+      role="MusicCardContainer"
+      aria-label="Music Card Container"
     >
       {data.map((music) => (
         <Card
-          key={music.music_title}
+          key={music.music_id}
           sx={{ display: "flex" }}
           onClick={() => {
             copyToClipboard(music.music_title);
           }}
+          role="MusicCard"
+          aria-label={music.music_title}
         >
           <CardMedia
             component="img"
@@ -44,7 +47,7 @@ export default function MusicCard({ data }: { data: MusicCardData[] }) {
               objectFit: "cover",
               alignSelf: "center",
             }}
-            image={music.image_url}
+            image={music.image_url || "/placeholder.png"}
             alt={music.music_title}
           />
           <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>

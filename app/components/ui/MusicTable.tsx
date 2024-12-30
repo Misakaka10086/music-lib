@@ -45,7 +45,7 @@ export default function MusicTable({ data }: { data: MusicCardData[] }) {
               >
                 <TableCell>
                   <Image
-                    src={row.image_url}
+                    src={row.image_url || "/placeholder.png"}
                     alt={row.music_title}
                     width={50}
                     height={50}

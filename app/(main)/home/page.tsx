@@ -73,7 +73,7 @@ export default function Page() {
 
   return (
     <Box sx={{ p: 1 }}>
-      <Search placeholder="搜索你想听的歌曲 点击可以复制点歌" onSearch={handleSearch} />
+      <Search placeholder="搜索你想听的歌曲 点击卡片复制点歌" onSearch={handleSearch} />
       {isMobile ? (
         <MusicCard data={filteredData} />
       ) : (

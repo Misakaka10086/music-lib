@@ -55,7 +55,7 @@ export default function Search({ placeholder, onSearch }: SearchProps) {
             input: {
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon />
+                  <SearchIcon sx={{color: "primary.main"}}/>
                 </InputAdornment>
               ),
               endAdornment: inputValue && (
