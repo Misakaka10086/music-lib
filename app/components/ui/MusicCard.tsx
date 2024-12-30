@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -5,18 +7,64 @@ import {
   Typography,
   Chip,
   Box,
-  Container,
 } from "@mui/material";
 import {
   fetchAllMusicCardData,
-  fetchFilteredMusicCardData,
 } from "@/app/lib/processMusicCardData";
-import TestSkeleton from "@/app/components/ui/skeleton";
+import TableSkeleton from "@/app/components/ui/TableSkeleton";
 import { MusicCardData } from "@/app/components/MusicCard/types";
 import { useCopyToClipboard } from "@/app/components/ui/copyToClipboard";
+import { useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
 
-export default function MusicCard({ data }: { data: MusicCardData[] }) {
+export default function MusicCard() {
+  const [allMusicData, setAllMusicData] = useState<MusicCardData[]>([]);
+  const [filteredData, setFilteredData] = useState<MusicCardData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
   const copyToClipboard = useCopyToClipboard();
+
+  // Fetch all music data once when component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await fetchAllMusicCardData(Number.MAX_SAFE_INTEGER, 1);
+        setAllMusicData(data);
+        setFilteredData(data);
+      } catch (error) {
+        console.error("Error fetching music data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // Filter data based on search query
+  useEffect(() => {
+    const query = searchParams.get("q")?.toLowerCase() || "";
+    if (!query.trim()) {
+      setFilteredData(allMusicData);
+      return;
+    }
+
+    const filtered = allMusicData.filter((music) => {
+      const title = music.music_title?.toLowerCase() || "";
+      const artist = music.original_artist?.toLowerCase() || "";
+      const tags = music.tags?.map((tag) => tag?.toLowerCase() || "") || [];
+
+      return (
+        title.includes(query) ||
+        artist.includes(query) ||
+        tags.some((tag) => tag.includes(query))
+      );
+    });
+    setFilteredData(filtered);
+  }, [searchParams, allMusicData]);
+
+  if (loading) {
+    return <TableSkeleton />;
+  }
 
   return (
     <Box
@@ -28,7 +76,7 @@ export default function MusicCard({ data }: { data: MusicCardData[] }) {
       role="MusicCardContainer"
       aria-label="Music Card Container"
     >
-      {data.map((music) => (
+      {filteredData.map((music) => (
         <Card
           key={music.music_id}
           sx={{ display: "flex" }}
