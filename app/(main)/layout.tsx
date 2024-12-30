@@ -16,7 +16,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import SettingsIcon from "@mui/icons-material/Settings";
 import HandymanIcon from "@mui/icons-material/Handyman";
 import { lightTheme, darkTheme } from "../theme";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Footer } from "@/app/components/Footer/Footer";
 import { SnackbarProvider } from "notistack";
@@ -43,6 +43,22 @@ export function HideOnScroll(props: Props) {
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useUser();
   const [isDarkMode, setIsDarkMode] = useState(true);
+
+  // 初始化时从本地存储读取主题设置
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('themeMode');
+    if (savedTheme) {
+      setIsDarkMode(savedTheme === 'dark');
+    }
+  }, []);
+
+  // 当主题改变时保存到本地存储
+  const toggleTheme = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    localStorage.setItem('themeMode', newMode ? 'dark' : 'light');
+  };
+
   const theme = useMemo(
     () => (isDarkMode ? darkTheme : lightTheme),
     [isDarkMode]
@@ -79,7 +95,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           >
             <Toolbar>
               <IconButton
-                onClick={() => setIsDarkMode(!isDarkMode)}
+                onClick={toggleTheme}
                 aria-label="Toggle dark mode"
               >
                 <Brightness4Icon
