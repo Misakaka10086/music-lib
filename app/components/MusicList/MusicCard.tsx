@@ -54,8 +54,27 @@ export default function MusicCard() {
       return;
     }
 
-    const results = fuse.search(query.trim()).map((result) => result.item);
-    setFilteredData(results);
+    // Split the query into individual words
+    const queryWords = query.split(/\s+/).filter(word => word.trim() !== '');
+
+    if (queryWords.length === 0) {
+      setFilteredData(allMusicData);
+      return;
+    }
+
+    // Search for each word
+    const resultsByWord = queryWords.map(word =>
+      fuse.search(word).map(result => result.item)
+    );
+
+    // Find the intersection of the results
+    let intersection = allMusicData;
+    resultsByWord.forEach(results => {
+      intersection = intersection.filter(item => results.includes(item));
+    });
+
+    setFilteredData(intersection);
+
   }, [searchParams, fuse]);
 
   if (loading) {
