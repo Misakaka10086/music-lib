@@ -44,6 +44,9 @@ importers:
       '@vercel/postgres':
         specifier: ^0.10.0
         version: 0.10.0
+      fuse.js:
+        specifier: ^7.0.0
+        version: 7.0.0
       next:
         specifier: 15.1.2
         version: 15.1.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.83.0)
@@ -1123,6 +1126,10 @@ packages:
 
   function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
+
+  fuse.js@7.0.0:
+    resolution: {integrity: sha512-14F4hBIxqKvD4Zz/XjDc3y94mNZN6pRv3U13Udo0lNLCWRBUsrMv2xwcF/y/Z5sV6+FQW+/ow68cHpm4sunt8Q==}
+    engines: {node: '>=10'}
 
   globals@11.12.0:
     resolution: {integrity: sha512-WOBp/EEGUiIsJSp7wcv/y6MO+lV9UoncWqxuFfm8eBwzWNgyfBd6Gz+IeKQ9jCmyhoH99g15M3T+QaVHFjizVA==}
@@ -2954,6 +2961,8 @@ snapshots:
   find-root@1.1.0: {}
 
   function-bind@1.1.2: {}
+
+  fuse.js@7.0.0: {}
 
   globals@11.12.0: {}
 

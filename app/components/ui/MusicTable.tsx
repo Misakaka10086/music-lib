@@ -17,11 +17,12 @@ import {
   ArtistTypography,
 } from "@/app/components/ui/TypographyWithTheme";
 import { MusicCardData } from "@/app/components/MusicCard/types";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useMemo } from "react";
 import { useCopyToClipboard } from "@/app/components/ui/copyToClipboard";
 import { useSearchParams } from "next/navigation";
 import { fetchAllMusicCardData } from "@/app/lib/processMusicCardData";
 import TableSkeleton from "@/app/components/ui/TableSkeleton";
+import Fuse from 'fuse.js'
 
 export default function MusicTable() {
   const [allMusicData, setAllMusicData] = useState<MusicCardData[]>([]);
@@ -36,7 +37,6 @@ export default function MusicTable() {
       try {
         const data = await fetchAllMusicCardData(Number.MAX_SAFE_INTEGER, 1);
         setAllMusicData(data);
-        setFilteredData(data);
       } catch (error) {
         console.error("Error fetching music data:", error);
       } finally {
@@ -46,6 +46,14 @@ export default function MusicTable() {
     fetchData();
   }, []);
 
+  // Initialize Fuse.js
+  const fuse = useMemo(() => {
+    return new Fuse(allMusicData, {
+      keys: ['music_title', 'original_artist', 'tags'],
+      threshold: 0.3 // Adjust threshold as needed
+    });
+  }, [allMusicData]);
+
   // Filter data based on search query
   useEffect(() => {
     const query = searchParams.get("q")?.toLowerCase() || "";
@@ -54,19 +62,28 @@ export default function MusicTable() {
       return;
     }
 
-    const filtered = allMusicData.filter((music) => {
-      const title = music.music_title?.toLowerCase() || "";
-      const artist = music.original_artist?.toLowerCase() || "";
-      const tags = music.tags?.map((tag) => tag?.toLowerCase() || "") || [];
+    // Split the query into individual words
+    const queryWords = query.split(/\s+/).filter(word => word.trim() !== '');
 
-      return (
-        title.includes(query) ||
-        artist.includes(query) ||
-        tags.some((tag) => tag.includes(query))
-      );
+    if (queryWords.length === 0) {
+      setFilteredData(allMusicData);
+      return;
+    }
+
+    // Search for each word
+    const resultsByWord = queryWords.map(word =>
+      fuse.search(word).map(result => result.item)
+    );
+
+    // Find the intersection of the results
+    let intersection = allMusicData;
+    resultsByWord.forEach(results => {
+      intersection = intersection.filter(item => results.includes(item));
     });
-    setFilteredData(filtered);
-  }, [searchParams, allMusicData]);
+
+    setFilteredData(intersection);
+
+  }, [searchParams, fuse]);
 
   const handleRowClick = useCallback((musicTitle: string) => {
     copyToClipboard(musicTitle);
