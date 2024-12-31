@@ -28,6 +28,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN">
+      <head>
+        <link rel="stylesheet" href="/css/base.css" />
+        <link rel="stylesheet" href="/css/demo2.css" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <GoogleAnalytics />
         <UserProvider>{children}</UserProvider>
