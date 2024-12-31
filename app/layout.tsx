@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Box } from '@mui/material';
-import { Footer } from './components/Footer/Footer';
-import { UserProvider } from '@auth0/nextjs-auth0/client';
-import GoogleAnalytics from '@/app/lib/GoogleAnalytics';
+import { Box } from "@mui/material";
+import { Footer } from "./components/Footer/Footer";
+import { UserProvider } from "@auth0/nextjs-auth0/client";
+import GoogleAnalytics from "@/app/lib/GoogleAnalytics";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,10 +29,8 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <UserProvider>
-          <GoogleAnalytics />
-          {children}
-        </UserProvider>
+        <GoogleAnalytics />
+        <UserProvider>{children}</UserProvider>
       </body>
     </html>
   );
