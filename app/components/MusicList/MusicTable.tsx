@@ -16,12 +16,12 @@ import {
   TitleTypography,
   ArtistTypography,
 } from "@/app/components/ui/TypographyWithTheme";
-import { MusicCardData } from "@/app/components/MusicCard/types";
+import { MusicCardData } from "@/app/components/MusicList/types";
 import { useCallback, useState, useEffect, useMemo } from "react";
-import { useCopyToClipboard } from "@/app/components/ui/copyToClipboard";
+import { useCopyToClipboard } from "@/app/lib/copyToClipboard";
 import { useSearchParams } from "next/navigation";
 import { fetchAllMusicCardData } from "@/app/lib/processMusicCardData";
-import TableSkeleton from "@/app/components/ui/TableSkeleton";
+import TableSkeleton from "@/app/components/MusicList/TableSkeleton";
 import Fuse from "fuse.js";
 
 export default function MusicTable() {

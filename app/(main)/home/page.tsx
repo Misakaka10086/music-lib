@@ -3,8 +3,8 @@
 import { Box, Divider, styled } from "@mui/material";
 import Search from "@/app/components/ui/search";
 import { useState, useEffect } from "react";
-import MusicTable from "@/app/components/ui/MusicTable";
-import MusicCard from "@/app/components/ui/MusicCard";
+import MusicTable from "@/app/components/MusicList/MusicTable";
+import MusicCard from "@/app/components/MusicList/MusicCard";
 import { useMediaQuery, useTheme } from "@mui/material";
 import TagChip from "@/app/components/ui/TagChip";
 

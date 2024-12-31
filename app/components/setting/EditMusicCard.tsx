@@ -13,7 +13,7 @@ import {
   updateMusicCardDataByMusicId,
   deleteMusicCardDataByMusicId,
 } from "@/app/lib/processMusicCardData";
-import { MusicCardData } from "@/app/components/MusicCard/types";
+import { MusicCardData } from "@/app/components/MusicList/types";
 
 export interface EditMusicCardProps {
   open: boolean;

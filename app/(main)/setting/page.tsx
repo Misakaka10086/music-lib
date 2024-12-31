@@ -1,7 +1,7 @@
 "use client";
 import { Box, Container, CircularProgress } from "@mui/material";
 import { useEffect, useState, useCallback, useRef, Suspense, useMemo, memo } from "react";
-import { MusicCardData } from "@/app/components/MusicCard/types";
+import { MusicCardData } from "@/app/components/MusicList/types";
 import MusicCardSkeleton from "@/app/components/MusicCard/Skeleton";
 
 import MusicCard from "@/app/components/MusicCard/MusicCard";

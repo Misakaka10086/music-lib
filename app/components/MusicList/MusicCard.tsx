@@ -9,8 +9,8 @@ import {
   Box,
 } from "@mui/material";
 import { fetchAllMusicCardData } from "@/app/lib/processMusicCardData";
-import { MusicCardData } from "@/app/components/MusicCard/types";
-import { useCopyToClipboard } from "@/app/components/ui/copyToClipboard";
+import { MusicCardData } from "@/app/components/MusicList/types";
+import { useCopyToClipboard } from "@/app/lib/copyToClipboard";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
 import CardSkeleton from "./CardSkeleton";

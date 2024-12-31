@@ -1,7 +1,7 @@
 // utils/fetchAllMusicCardData.ts
 "use server";
 import { createPool } from "@vercel/postgres";
-import { MusicCardData } from "@/app/components/MusicCard/types";
+import { MusicCardData } from "@/app/components/MusicList/types";
 
 const pool = createPool({
   connectionString: process.env.POSTGRES_URL || process.env.VERCEL_POSTGRES_URL,
