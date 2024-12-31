@@ -6,8 +6,11 @@ import { useEffect, useState } from "react";
 import { fetchAllTags } from "@/app/lib/processMusicCardData";
 
 interface TagChipProps {
-  tag?: string; // Make tag optional for standalone usage
+  tag?: string;
 }
+
+// 使用模块作用域变量缓存标签数据
+let cachedTags: string[] | null = null;
 
 export default function TagChip({ tag }: TagChipProps) {
   const router = useRouter();
@@ -15,9 +18,15 @@ export default function TagChip({ tag }: TagChipProps) {
   const [tags, setTags] = useState<string[]>([]);
   const query = searchParams.get("q") || "";
 
-  // Fetch tags when component mounts
   useEffect(() => {
-    fetchAllTags().then((tags) => setTags(tags));
+    if (cachedTags) {
+      setTags(cachedTags);
+    } else {
+      fetchAllTags().then((fetchedTags) => {
+        cachedTags = fetchedTags;
+        setTags(fetchedTags);
+      });
+    }
   }, []);
 
   const handleClick = (clickedTag: string) => {
@@ -26,30 +35,11 @@ export default function TagChip({ tag }: TagChipProps) {
     router.push(`?${params.toString()}`);
   };
 
-  // If tag prop is provided, render single chip
-  if (tag) {
-    return (
-      <Box>
-        <Divider>点击标签，快速筛选</Divider>
-        <Box sx={{ display: "flex", flexWrap: "wrap", p: 1 }} role="listbox">
-          <Chip
-            label={tag}
-            onClick={() => handleClick(tag)}
-            sx={{ cursor: "pointer" }}
-            variant={tag === query ? "outlined" : "filled"}
-          />
-        </Box>
-        <Divider sx={{ my: 1 }} />
-      </Box>
-    );
-  }
-
-  // If no tag prop, render all tags
-  return (
+  const renderTagList = (tagsToRender: string[]) => (
     <Box>
       <Divider>点击标签，快速筛选</Divider>
       <Box sx={{ display: "flex", flexWrap: "wrap", p: 1 }} role="listbox">
-        {tags.map((t) => (
+        {tagsToRender.map((t) => (
           <Chip
             key={t}
             label={t}
@@ -62,4 +52,10 @@ export default function TagChip({ tag }: TagChipProps) {
       <Divider sx={{ my: 1 }} />
     </Box>
   );
+
+  if (tag) {
+    return renderTagList([tag]);
+  }
+
+  return renderTagList(tags);
 }
