@@ -8,16 +8,13 @@ import {
   Chip,
   Box,
 } from "@mui/material";
-import {
-  fetchAllMusicCardData,
-} from "@/app/lib/processMusicCardData";
-import TableSkeleton from "@/app/components/ui/TableSkeleton";
+import { fetchAllMusicCardData } from "@/app/lib/processMusicCardData";
 import { MusicCardData } from "@/app/components/MusicCard/types";
 import { useCopyToClipboard } from "@/app/components/ui/copyToClipboard";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
 import CardSkeleton from "./CardSkeleton";
-import Fuse from 'fuse.js';
+import Fuse from "fuse.js";
 
 export default function MusicCard() {
   const [allMusicData, setAllMusicData] = useState<MusicCardData[]>([]);
@@ -44,8 +41,8 @@ export default function MusicCard() {
   // Initialize Fuse.js
   const fuse = useMemo(() => {
     return new Fuse(allMusicData, {
-      keys: ['music_title', 'original_artist', 'tags'],
-      threshold: 0.3 // Adjust threshold as needed
+      keys: ["music_title", "original_artist", "tags"],
+      threshold: 0.3, // Adjust threshold as needed
     });
   }, [allMusicData]);
 
@@ -57,27 +54,8 @@ export default function MusicCard() {
       return;
     }
 
-    // Split the query into individual words
-    const queryWords = query.split(/\s+/).filter(word => word.trim() !== '');
-
-    if (queryWords.length === 0) {
-      setFilteredData(allMusicData);
-      return;
-    }
-
-    // Search for each word
-    const resultsByWord = queryWords.map(word =>
-      fuse.search(word).map(result => result.item)
-    );
-
-    // Find the intersection of the results
-    let intersection = allMusicData;
-    resultsByWord.forEach(results => {
-      intersection = intersection.filter(item => results.includes(item));
-    });
-
-    setFilteredData(intersection);
-
+    const results = fuse.search(query.trim()).map((result) => result.item);
+    setFilteredData(results);
   }, [searchParams, fuse]);
 
   if (loading) {

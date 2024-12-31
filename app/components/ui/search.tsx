@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Box, TextField, InputAdornment, IconButton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -46,11 +46,11 @@ export default function Search({ placeholder }: SearchProps) {
     setIsComposing(true);
   };
 
-  const handleCompositionEnd = (e: React.CompositionEvent<HTMLInputElement>) => {
+  const handleCompositionEnd = (
+    e: React.CompositionEvent<HTMLInputElement>
+  ) => {
     setIsComposing(false);
-    // 使用 e.target.value 获取完整输入结果，而不是追加 e.data
     const value = (e.target as HTMLInputElement).value;
-    setInputValue(value);
     updateSearchParam(value);
   };
 

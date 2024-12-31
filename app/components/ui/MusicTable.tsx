@@ -22,7 +22,7 @@ import { useCopyToClipboard } from "@/app/components/ui/copyToClipboard";
 import { useSearchParams } from "next/navigation";
 import { fetchAllMusicCardData } from "@/app/lib/processMusicCardData";
 import TableSkeleton from "@/app/components/ui/TableSkeleton";
-import Fuse from 'fuse.js'
+import Fuse from "fuse.js";
 
 export default function MusicTable() {
   const [allMusicData, setAllMusicData] = useState<MusicCardData[]>([]);
@@ -49,8 +49,8 @@ export default function MusicTable() {
   // Initialize Fuse.js
   const fuse = useMemo(() => {
     return new Fuse(allMusicData, {
-      keys: ['music_title', 'original_artist', 'tags'],
-      threshold: 0.3 // Adjust threshold as needed
+      keys: ["music_title", "original_artist", "tags"],
+      threshold: 0.3, // Adjust threshold as needed
     });
   }, [allMusicData]);
 
@@ -62,32 +62,16 @@ export default function MusicTable() {
       return;
     }
 
-    // Split the query into individual words
-    const queryWords = query.split(/\s+/).filter(word => word.trim() !== '');
-
-    if (queryWords.length === 0) {
-      setFilteredData(allMusicData);
-      return;
-    }
-
-    // Search for each word
-    const resultsByWord = queryWords.map(word =>
-      fuse.search(word).map(result => result.item)
-    );
-
-    // Find the intersection of the results
-    let intersection = allMusicData;
-    resultsByWord.forEach(results => {
-      intersection = intersection.filter(item => results.includes(item));
-    });
-
-    setFilteredData(intersection);
-
+    const results = fuse.search(query.trim()).map((result) => result.item);
+    setFilteredData(results);
   }, [searchParams, fuse]);
 
-  const handleRowClick = useCallback((musicTitle: string) => {
-    copyToClipboard(musicTitle);
-  }, [copyToClipboard]);
+  const handleRowClick = useCallback(
+    (musicTitle: string) => {
+      copyToClipboard(musicTitle);
+    },
+    [copyToClipboard]
+  );
 
   if (loading) {
     return <TableSkeleton />;
@@ -105,7 +89,8 @@ export default function MusicTable() {
                 onClick={() => handleRowClick(row.music_title)}
                 sx={{
                   "&:hover": {
-                    backgroundColor: (theme) => theme.palette.surface.container + " !important",
+                    backgroundColor: (theme) =>
+                      theme.palette.surface.container + " !important",
                   },
                 }}
               >
