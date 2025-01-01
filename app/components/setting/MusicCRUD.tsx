@@ -157,10 +157,6 @@ export default function MusicCRUD({}: MusicCRUDProps) {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3 }}>
-        <Typography variant="h4">Music Management</Typography>
-      </Box>
-
       {/* Form Section */}
       <Box component="form" onSubmit={handleSubmit} sx={{ mb: 4 }}>
         <Box sx={{ display: "flex", gap: 2 }}>

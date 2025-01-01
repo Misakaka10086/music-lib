@@ -197,4 +197,99 @@ export async function listMusicRecords() {
     console.error("Error listing music records:", error);
     return [];
   }
+}
+
+interface StreamerData {
+  id?: string;
+  name: string;
+  live_url: string;
+  follower?: number;
+}
+
+// Create new streamer record
+export async function createStreamerRecord(data: Omit<StreamerData, 'id'>) {
+  try {
+    const result = await pool.query(
+      `
+      INSERT INTO live_streamer (name, live_url, follower)
+      VALUES ($1, $2, $3)
+      RETURNING id
+      `,
+      [data.name, data.live_url, data.follower || 0]
+    );
+    return { success: true, id: result.rows[0].id };
+  } catch (error) {
+    console.error("Error creating streamer record:", error);
+    return { success: false, error: error };
+  }
+}
+
+// Read streamer record by ID
+export async function readStreamerRecord(id: string) {
+  try {
+    const result = await pool.query(
+      `
+      SELECT id, name, live_url, follower
+      FROM live_streamer
+      WHERE id = $1
+      `,
+      [id]
+    );
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error reading streamer record:", error);
+    return null;
+  }
+}
+
+// Update streamer record
+export async function updateStreamerRecord(data: StreamerData) {
+  try {
+    await pool.query(
+      `
+      UPDATE live_streamer
+      SET name = $1, live_url = $2, follower = $3
+      WHERE id = $4
+      `,
+      [data.name, data.live_url, data.follower, data.id]
+    );
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating streamer record:", error);
+    return { success: false, error: error };
+  }
+}
+
+// Delete streamer record
+export async function deleteStreamerRecord(id: string) {
+  try {
+    await pool.query(
+      `
+      DELETE FROM live_streamer
+      WHERE id = $1
+      `,
+      [id]
+    );
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting streamer record:", error);
+    return { success: false, error: error };
+  }
+}
+
+// List all streamer records
+export async function listStreamerRecords() {
+  try {
+    const result = await pool.query(
+      `
+      SELECT id, name, live_url, follower
+      FROM live_streamer
+      ORDER BY name
+      `
+    );
+    return result.rows;
+  } catch (error) {
+    console.error("Error listing streamer records:", error);
+    return [];
+  }
 } 
