@@ -1,13 +1,35 @@
 "use client";
 
-import { Box, Typography, TextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Chip, Stack } from "@mui/material";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+  Chip,
+  Stack,
+} from "@mui/material";
 import { useEffect, useState } from "react";
-import { createMusicRecord, readMusicRecord, updateMusicRecord, deleteMusicRecord, listMusicRecords } from "@/app/lib/data_edit";
+import {
+  createMusicRecord,
+  readMusicRecord,
+  updateMusicRecord,
+  deleteMusicRecord,
+  listMusicRecords,
+} from "@/app/lib/data_edit";
 import { MusicCardData } from "@/app/components/MusicList/types";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import SearchIcon from "@mui/icons-material/Search";
 
 interface MusicCRUDProps {
   // Add any props if needed
@@ -16,15 +38,16 @@ interface MusicCRUDProps {
 export default function MusicCRUD({}: MusicCRUDProps) {
   const [musicList, setMusicList] = useState<MusicCardData[]>([]);
   const [formData, setFormData] = useState<MusicCardData>({
-    music_id: '',
-    image_url: '',
-    music_title: '',
-    original_artist: '',
+    music_id: "",
+    image_url: "",
+    music_title: "",
+    original_artist: "",
     favorite: 0,
-    tags: []
+    tags: [],
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [newTag, setNewTag] = useState('');
+  const [newTag, setNewTag] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Load all music records on mount
   useEffect(() => {
@@ -38,7 +61,7 @@ export default function MusicCRUD({}: MusicCRUDProps) {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,32 +70,32 @@ export default function MusicCRUD({}: MusicCRUDProps) {
 
   const addTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        tags: [...prev.tags, newTag.trim()]
+        tags: [...prev.tags, newTag.trim()],
       }));
-      setNewTag('');
+      setNewTag("");
     }
   };
 
   const removeTag = (tagToRemove: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
+      tags: prev.tags.filter((tag) => tag !== tagToRemove),
     }));
   };
 
   const incrementFavorite = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      favorite: (prev.favorite || 0) + 1
+      favorite: (prev.favorite || 0) + 1,
     }));
   };
 
   const decrementFavorite = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      favorite: Math.max((prev.favorite || 0) - 1, 0)
+      favorite: Math.max((prev.favorite || 0) - 1, 0),
     }));
   };
 
@@ -107,63 +130,81 @@ export default function MusicCRUD({}: MusicCRUDProps) {
 
   const resetForm = () => {
     setFormData({
-      music_id: '',
-      image_url: '',
-      music_title: '',
-      original_artist: '',
+      music_id: "",
+      image_url: "",
+      music_title: "",
+      original_artist: "",
       favorite: 0,
-      tags: []
+      tags: [],
     });
-    setNewTag('');
+    setNewTag("");
     setIsEditing(false);
+  };
+
+  const handleSearch = () => {
+    const filtered = musicList.filter(
+      (music) =>
+        music.music_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        music.original_artist.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setMusicList(filtered);
+  };
+
+  const resetSearch = () => {
+    loadMusicRecords();
+    setSearchQuery("");
   };
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        Music Management
-      </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3 }}>
+        <Typography variant="h4">Music Management</Typography>
+      </Box>
 
       {/* Form Section */}
       <Box component="form" onSubmit={handleSubmit} sx={{ mb: 4 }}>
-        <TextField
-          label="Music Title"
-          name="music_title"
-          value={formData.music_title}
-          onChange={handleInputChange}
-          fullWidth
-          margin="normal"
-          required
-        />
-        <TextField
-          label="Original Artist"
-          name="original_artist"
-          value={formData.original_artist}
-          onChange={handleInputChange}
-          fullWidth
-          margin="normal"
-          required
-        />
-        <TextField
-          label="Image URL"
-          name="image_url"
-          value={formData.image_url}
-          onChange={handleInputChange}
-          fullWidth
-          margin="normal"
-        />
-
-        {/* Favorite Field */}
-        <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <IconButton onClick={decrementFavorite} disabled={formData.favorite === 0}>
-            <FavoriteBorderIcon />
-          </IconButton>
-          <Typography variant="body1">
-            Favorites: {formData.favorite}
-          </Typography>
-          <IconButton onClick={incrementFavorite}>
-            <FavoriteIcon color="error" />
-          </IconButton>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <TextField
+            label="Music Title"
+            name="music_title"
+            value={formData.music_title}
+            onChange={handleInputChange}
+            fullWidth
+            margin="normal"
+            required
+          />
+          <TextField
+            label="Original Artist"
+            name="original_artist"
+            value={formData.original_artist}
+            onChange={handleInputChange}
+            fullWidth
+            margin="normal"
+            required
+          />
+          <TextField
+            label="Image URL"
+            name="image_url"
+            value={formData.image_url}
+            onChange={handleInputChange}
+            fullWidth
+            margin="normal"
+          />
+          {/* Favorite Field */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <IconButton
+              onClick={decrementFavorite}
+              disabled={formData.favorite === 0}
+            >
+              <FavoriteBorderIcon />
+            </IconButton>
+            <Typography variant="body1">
+              Favorites: {formData.favorite}
+            </Typography>
+            <IconButton onClick={incrementFavorite}>
+              <FavoriteIcon color="error" />
+            </IconButton>
+          </Box>
         </Box>
 
         {/* Tags Field */}
@@ -171,24 +212,7 @@ export default function MusicCRUD({}: MusicCRUDProps) {
           <Typography variant="subtitle1" gutterBottom>
             Tags
           </Typography>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-            {formData.tags.map((tag) => (
-              <Chip
-                key={tag}
-                label={tag}
-                onDelete={() => removeTag(tag)}
-                sx={{ m: 0.5 }}
-              />
-            ))}
-          </Box>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <TextField
-              label="New Tag"
-              value={newTag}
-              onChange={handleTagChange}
-              onKeyPress={(e) => e.key === 'Enter' && addTag()}
-              fullWidth
-            />
+          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
             <Button
               variant="contained"
               onClick={addTag}
@@ -196,18 +220,36 @@ export default function MusicCRUD({}: MusicCRUDProps) {
             >
               Add
             </Button>
+            <TextField
+              label="New Tag"
+              value={newTag}
+              onChange={handleTagChange}
+              onKeyDown={(e) => e.key === "Enter" && addTag()}
+              fullWidth
+            />
+
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, ml: 2 }}>
+              {formData.tags.map((tag) => (
+                <Chip
+                  key={tag}
+                  label={tag}
+                  onDelete={() => removeTag(tag)}
+                  sx={{ m: 0.5 }}
+                />
+              ))}
+            </Box>
           </Box>
         </Box>
 
         {/* Form Actions */}
-        <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
+        <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
           <Button
             type="submit"
             variant="contained"
             color="primary"
             size="large"
           >
-            {isEditing ? 'Update' : 'Create'}
+            {isEditing ? "Update" : "Create"}
           </Button>
           <Button
             type="button"
@@ -219,6 +261,33 @@ export default function MusicCRUD({}: MusicCRUDProps) {
             Reset
           </Button>
         </Box>
+      </Box>
+
+      {/* Search Section */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3 }}>
+        <Chip
+          label={`Total: ${musicList.length}`}
+          color="primary"
+          variant="outlined"
+        />
+        <TextField
+          label="Search"
+          variant="outlined"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+          fullWidth
+        />
+        <Button
+          variant="contained"
+          startIcon={<SearchIcon />}
+          onClick={handleSearch}
+        >
+          Search
+        </Button>
+        <Button variant="outlined" onClick={resetSearch}>
+          Reset
+        </Button>
       </Box>
 
       {/* List Section */}
@@ -239,15 +308,15 @@ export default function MusicCRUD({}: MusicCRUDProps) {
                 <TableCell>{music.music_title}</TableCell>
                 <TableCell>{music.original_artist}</TableCell>
                 <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <FavoriteIcon color={music.favorite > 0 ? "error" : "disabled"} />
-                    <Typography variant="body2">
-                      {music.favorite}
-                    </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <FavoriteIcon
+                      color={music.favorite > 0 ? "error" : "disabled"}
+                    />
+                    <Typography variant="body2">{music.favorite}</Typography>
                   </Box>
                 </TableCell>
                 <TableCell>
-                  <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
+                  <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }}>
                     {music.tags.map((tag) => (
                       <Chip key={tag} label={tag} size="small" />
                     ))}
