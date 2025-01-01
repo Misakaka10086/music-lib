@@ -40,6 +40,7 @@ export const Footer = () => {
               color="primary.main"
               fontFamily="Italianno"
               fontSize="2.5rem"
+              sx={{ userSelect: "none" }}
             >
               TangYuXiaoBao i
             </Typography>
