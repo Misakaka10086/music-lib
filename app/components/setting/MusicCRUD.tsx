@@ -78,13 +78,18 @@ export default function MusicCRUD({}: MusicCRUDProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isEditing) {
-      await updateMusicRecord(formData);
-    } else {
-      await createMusicRecord(formData);
+    try {
+      if (isEditing) {
+        await updateMusicRecord(formData);
+      } else {
+        const { music_id, ...newRecord } = formData;
+        await createMusicRecord(newRecord);
+      }
+      resetForm();
+      loadMusicRecords();
+    } catch (error) {
+      console.error("Error saving music record:", error);
     }
-    resetForm();
-    loadMusicRecords();
   };
 
   const handleEdit = async (musicId: string) => {
@@ -121,16 +126,6 @@ export default function MusicCRUD({}: MusicCRUDProps) {
 
       {/* Form Section */}
       <Box component="form" onSubmit={handleSubmit} sx={{ mb: 4 }}>
-        <TextField
-          label="Music ID"
-          name="music_id"
-          value={formData.music_id}
-          onChange={handleInputChange}
-          fullWidth
-          margin="normal"
-          required
-          disabled={isEditing}
-        />
         <TextField
           label="Music Title"
           name="music_title"
