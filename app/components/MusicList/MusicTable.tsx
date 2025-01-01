@@ -62,26 +62,30 @@ export default function MusicTable() {
       return;
     }
 
-    // Split the query into individual words
-    const queryWords = query.split(/\s+/).filter(word => word.trim() !== '');
+    // First, perform a search for the entire query string
+    const exactSearchResults = fuse.search(query.trim()).map(result => result.item);
 
-    if (queryWords.length === 0) {
-      setFilteredData(allMusicData);
-      return;
+    // If the query contains multiple words, perform an intersection search
+    const queryWords = query.trim().split(/\s+/).filter(word => word.trim() !== '');
+    let intersectionResults: MusicCardData[] = [];
+
+    if (queryWords.length > 1) {
+      const resultsByWord = queryWords.map(word =>
+        fuse.search(word).map(result => result.item)
+      );
+
+      intersectionResults = allMusicData.filter(item =>
+        resultsByWord.every(results => results.includes(item))
+      );
     }
 
-    // Search for each word
-    const resultsByWord = queryWords.map(word =>
-      fuse.search(word).map(result => result.item)
-    );
+    // Combine the results, prioritizing exact matches and avoiding duplicates
+    const combinedResults = [
+      ...exactSearchResults,
+      ...intersectionResults.filter(item => !exactSearchResults.includes(item))
+    ];
 
-    // Find the intersection of the results
-    let intersection = allMusicData;
-    resultsByWord.forEach(results => {
-      intersection = intersection.filter(item => results.includes(item));
-    });
-
-    setFilteredData(intersection);
+    setFilteredData(combinedResults);
 
   }, [searchParams, fuse]);
 
