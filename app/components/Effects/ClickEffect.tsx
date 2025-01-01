@@ -30,6 +30,8 @@ const DEFAULT_CONFIG = {
   speedFactor: 1,
 };
 
+const MAX_PARTICLES = 45; // 设置粒子总数上限
+
 const ClickEffect: React.FC<ClickEffectProps> = ({
   radius = DEFAULT_CONFIG.radius,
   minSize = DEFAULT_CONFIG.minSize,
@@ -69,7 +71,13 @@ const ClickEffect: React.FC<ClickEffectProps> = ({
       };
     });
 
-    setParticles((prevParticles) => [...prevParticles, ...newParticles]);
+    setParticles((prevParticles) => {
+      const combinedParticles = [...prevParticles, ...newParticles];
+      if (combinedParticles.length > MAX_PARTICLES) {
+        return combinedParticles.slice(combinedParticles.length - MAX_PARTICLES);
+      }
+      return combinedParticles;
+    });
   }, []);
 
   useEffect(() => {
