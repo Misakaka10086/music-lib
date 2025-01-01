@@ -7,7 +7,7 @@ import MusicTable from "@/app/components/MusicList/MusicTable";
 import MusicCard from "@/app/components/MusicList/MusicCard";
 import { useMediaQuery, useTheme } from "@mui/material";
 import TagChip from "@/app/components/ui/TagChip";
-
+import ClickEffect from "@/app/components/Effects/ClickEffect";
 export default function Page() {
   const [mounted, setMounted] = useState(false);
   const theme = useTheme();
@@ -22,7 +22,9 @@ export default function Page() {
   }
 
   return (
+
     <Box sx={{ p: 1 }}>
+      <ClickEffect />
       <Search placeholder="搜索你想听的歌曲 点击卡片复制点歌" />
       <TagChip />
       {isMobile ? <MusicCard /> : <MusicTable />}

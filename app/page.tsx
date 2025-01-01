@@ -6,12 +6,13 @@ import { Box, Typography, Button } from "@mui/material";
 import { useRouter } from "next/navigation";
 import "@fontsource/italianno";
 import SwirlBackground from "./components/SwirlBackground";
-
+import ClickEffect from "./components/Effects/ClickEffect";
 export default function Home() {
   const router = useRouter();
   return (
     <>
       <SwirlBackground />
+      <ClickEffect />
       <Box
         sx={{
           height: "100vh",
