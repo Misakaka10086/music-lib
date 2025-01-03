@@ -58,9 +58,18 @@ a {
 }
 
 ::selection {
-  background-color: rgba(232, 112, 166, 0.25); /* Set background color to purple with 50% opacity */
+  background-color: rgba(
+    232,
+    112,
+    166,
+    0.25
+  ); /* Set background color to purple with 50% opacity */
 }
 
 ::-moz-selection {
   background-color: rgba(232, 112, 166, 0.25); /* Firefox 需要使用这个 */
+}
+
+body {
+  cursor: url("/cursor@0.1x.png"), auto;
 }
