@@ -73,3 +73,21 @@ a {
 body {
   cursor: url("/cursor@0.1x.png"), auto;
 }
+
+@keyframes bounce {
+  0% { transform: scale(1); }
+  10% { transform: scale(0.95); }
+  20% { transform: scale(1.04); }
+  30% { transform: scale(0.97); }
+  40% { transform: scale(1.03); }
+  50% { transform: scale(0.98); }
+  60% { transform: scale(1.02); }
+  70% { transform: scale(0.99); }
+  80% { transform: scale(1.01); }
+  90% { transform: scale(0.995); }
+  100% { transform: scale(1); }
+}
+
+.bounce-animation {
+  animation: bounce 0.5s cubic-bezier(0.36, 0, 0.66, -0.56) forwards;
+}

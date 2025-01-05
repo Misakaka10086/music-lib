@@ -20,6 +20,7 @@ export default function MusicCard() {
   const [allMusicData, setAllMusicData] = useState<MusicCardData[]>([]);
   const [filteredData, setFilteredData] = useState<MusicCardData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [animatingCards, setAnimatingCards] = useState<Set<string>>(new Set());
   const searchParams = useSearchParams();
   const copyToClipboard = useCopyToClipboard();
 
@@ -96,41 +97,61 @@ export default function MusicCard() {
       aria-label="Music Card Container"
     >
       {filteredData.map((music) => (
-        <Card
+        <div
           key={music.music_id}
-          sx={{ display: "flex" }}
-          onClick={() => {
-            copyToClipboard(music.music_title);
-          }}
-          role="MusicCard"
-          aria-label={music.music_title}
+          className={animatingCards.has(music.music_id) ? 'bounce-animation' : ''}
         >
-          <CardMedia
-            component="img"
-            sx={{
-              width: 140,
-              height: 140,
-              flexShrink: 0,
-              objectFit: "cover",
-              alignSelf: "center",
+          <Card
+            sx={{ 
+              display: "flex",
+              cursor: "pointer",
+              transition: "transform 0.2s ease-in-out"
             }}
-            image={music.image_url || "/placeholder.png"}
-            alt={music.music_title}
-          />
-          <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
-            <CardContent>
-              <Typography gutterBottom variant="h5" component="div">
-                {music.music_title}
-              </Typography>
-              <Typography variant="body2">{music.original_artist}</Typography>
-              <Box sx={{ mt: 1, display: "flex", gap: 0.5, flexWrap: "wrap" }}>
-                {music.tags.map((tag) => (
-                  <Chip key={tag} label={tag} size="small" />
-                ))}
-              </Box>
-            </CardContent>
-          </Box>
-        </Card>
+            onClick={() => {
+              copyToClipboard(music.music_title);
+              setAnimatingCards(prev => {
+                const newSet = new Set(prev);
+                newSet.add(music.music_id);
+                setTimeout(() => {
+                  setAnimatingCards(current => {
+                    const updatedSet = new Set(current);
+                    updatedSet.delete(music.music_id);
+                    return updatedSet;
+                  });
+                }, 800);
+                return newSet;
+              });
+            }}
+            role="MusicCard"
+            aria-label={music.music_title}
+          >
+            <CardMedia
+              component="img"
+              sx={{
+                width: 140,
+                height: 140,
+                flexShrink: 0,
+                objectFit: "cover",
+                alignSelf: "center",
+              }}
+              image={music.image_url || "/placeholder.png"}
+              alt={music.music_title}
+            />
+            <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
+              <CardContent>
+                <Typography gutterBottom variant="h5" component="div">
+                  {music.music_title}
+                </Typography>
+                <Typography variant="body2">{music.original_artist}</Typography>
+                <Box sx={{ mt: 1, display: "flex", gap: 0.5, flexWrap: "wrap" }}>
+                  {music.tags.map((tag) => (
+                    <Chip key={tag} label={tag} size="small" />
+                  ))}
+                </Box>
+              </CardContent>
+            </Box>
+          </Card>
+        </div>
       ))}
     </Box>
   );
