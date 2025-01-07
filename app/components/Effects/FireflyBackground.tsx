@@ -97,8 +97,9 @@ const FireflyBackground = ({
         firefly.acceleration *= 0.95; // Damping factor
 
         // Calculate current speed with variation and acceleration
-        const currentSpeed = firefly.baseSpeed * 
-          (1 + Math.sin(firefly.time * 0.5) * firefly.speedVariation) + 
+        const currentSpeed =
+          firefly.baseSpeed *
+            (1 + Math.sin(firefly.time * 0.5) * firefly.speedVariation) +
           firefly.acceleration;
 
         // Clamp speed between min and max
@@ -118,21 +119,25 @@ const FireflyBackground = ({
         firefly.angle += firefly.angleSpeed;
 
         // Calculate wave offset
-        const waveOffsetX = Math.sin(firefly.time * firefly.waveFrequency) * firefly.waveAmplitude;
-        const waveOffsetY = Math.cos(firefly.time * firefly.waveFrequency) * firefly.waveAmplitude;
+        const waveOffsetX =
+          Math.sin(firefly.time * firefly.waveFrequency) * firefly.waveAmplitude;
+        const waveOffsetY =
+          Math.cos(firefly.time * firefly.waveFrequency) * firefly.waveAmplitude;
 
         // Update position with wave motion
         firefly.x += baseX + waveOffsetX;
         firefly.y += baseY + waveOffsetY;
 
-        // Bounce off edges with angle adjustment
-        if (firefly.x < 0 || firefly.x > canvas.width) {
-          firefly.angle = Math.PI - firefly.angle;
-          firefly.x = Math.max(0, Math.min(canvas.width, firefly.x));
+        // Handle the "wraparound" logic: when a firefly goes off the screen, make it appear on the opposite side
+        if (firefly.x < 0) {
+          firefly.x = canvas.width;
+        } else if (firefly.x > canvas.width) {
+          firefly.x = 0;
         }
-        if (firefly.y < 0 || firefly.y > canvas.height) {
-          firefly.angle = -firefly.angle;
-          firefly.y = Math.max(0, Math.min(canvas.height, firefly.y));
+        if (firefly.y < 0) {
+          firefly.y = canvas.height;
+        } else if (firefly.y > canvas.height) {
+          firefly.y = 0;
         }
 
         // Update opacity
@@ -154,7 +159,10 @@ const FireflyBackground = ({
         const b = parseInt(color.slice(5, 7), 16);
 
         gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${firefly.opacity})`);
-        gradient.addColorStop(0.4, `rgba(${r}, ${g}, ${b}, ${firefly.opacity * glowIntensity})`);
+        gradient.addColorStop(
+          0.4,
+          `rgba(${r}, ${g}, ${b}, ${firefly.opacity * glowIntensity})`
+        );
         gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
 
         // Draw outer glow
@@ -196,4 +204,4 @@ const FireflyBackground = ({
   );
 };
 
-export default FireflyBackground; 
+export default FireflyBackground;
