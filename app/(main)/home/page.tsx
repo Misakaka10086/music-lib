@@ -9,6 +9,8 @@ import { useMediaQuery, useTheme } from "@mui/material";
 import TagChip from "@/app/components/ui/TagChip";
 import ClickEffect from "@/app/components/Effects/ClickEffect";
 import FireflyBackground from "@/app/components/Effects/FireflyBackground";
+import MeteorBackground from "@/app/components/Effects/Meteor/MeteorBackground";
+
 export default function Page() {
   const [mounted, setMounted] = useState(false);
   const theme = useTheme();
@@ -25,6 +27,13 @@ export default function Page() {
   return (
     <Box sx={{ p: 1 }}>
       <ClickEffect />
+      <MeteorBackground 
+        meteorSize={1}
+        minTailLength={100}
+        maxTailLength={300}
+        tailThickness={1}
+        frequency={15}
+      />
       <FireflyBackground
         count={10}
         color="#E9FF97"
