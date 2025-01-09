@@ -7,14 +7,18 @@ interface NightSkyProps {
   starCount?: number
   twinkleSpeed?: number
   starSize?: number
+  rotateSpeed?: number
 }
 
 export default function NightSky({
   starCount = 100,
   twinkleSpeed = 1,
-  starSize = 2
+  starSize = 2,
+  rotateSpeed = 0.02
 }: NightSkyProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const rotationRef = useRef(0)
+  const animationFrameRef = useRef<number | null>(null)
 
   useEffect(() => {
     const container = containerRef.current
@@ -25,6 +29,10 @@ export default function NightSky({
 
     // Available timing function classes
     const timingClasses = ['star-timing-1', 'star-timing-2', 'star-timing-3']
+
+    // Create stars wrapper for rotation
+    const starsWrapper = document.createElement('div')
+    starsWrapper.className = styles.starsWrapper
 
     // Create stars
     for (let i = 0; i < starCount; i++) {
@@ -52,9 +60,26 @@ export default function NightSky({
       star.style.animationDelay = `${delay}s`
       star.style.animationDuration = `${duration}s`
       
-      container.appendChild(star)
+      starsWrapper.appendChild(star)
     }
-  }, [starCount, twinkleSpeed, starSize])
+
+    container.appendChild(starsWrapper)
+
+    // Rotation animation
+    const animate = () => {
+      rotationRef.current += rotateSpeed
+      starsWrapper.style.transform = `rotate(${rotationRef.current}deg)`
+      animationFrameRef.current = requestAnimationFrame(animate)
+    }
+
+    animate()
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+    }
+  }, [starCount, twinkleSpeed, starSize, rotateSpeed])
 
   return (
     <div 
