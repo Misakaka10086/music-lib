@@ -163,7 +163,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             bottom: 16,
             right: 16,
             "& > :not(style)": { m: 1 },
-            zIndex: 1000,
+            zIndex: 200,
           }}
         >
           <Tooltip

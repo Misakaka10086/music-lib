@@ -39,14 +39,14 @@ export default function Page() {
         color="#E9FF97"
         minSize={1}
         maxSize={2}
-        minSpeed={0.1}
-        maxSpeed={0.25}
+        minSpeed={0.03}
+        maxSpeed={0.3}
         glowSize={3}
         glowIntensity={0.5}
-        curveIntensity={1.0}
+        curveIntensity={0.01}
         waveSpeed={0.001}
-        speedVariation={0.3}
-        accelerationFactor={0.06}
+        speedVariation={0.01}
+        accelerationFactor={0.01}
       />
       <Search placeholder="搜索你想听的歌曲 点击卡片复制点歌" />
       <TagChip />

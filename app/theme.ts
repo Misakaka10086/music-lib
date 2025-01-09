@@ -333,9 +333,6 @@ export const lightTheme = createTheme({
         arrow: {
           color: lightColors.surfaceContainerHigh,
         },
-        popper: {
-          zIndex: 1500,
-        },
       },
     },
     MuiTypography: {
@@ -585,9 +582,6 @@ export const darkTheme = createTheme({
         },
         arrow: {
           color: darkColors.surfaceContainerHigh,
-        },
-        popper: {
-          zIndex: 1500,
         },
       },
     },

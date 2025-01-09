@@ -74,7 +74,7 @@ a:focus {
 	padding: 3rem 5vw;
 	text-align: center;
 	position: relative;
-	z-index: 1000;
+	z-index: 0;
 }
 
 .frame__title {
@@ -120,7 +120,7 @@ a:focus {
 	width: 100%;
 	text-align: center;
 	margin: -5.5vw 0 0 0;
-	z-index: 100;
+	z-index: 0;
 	font-size: 10vw;
 	color: var(--color-title);
 	line-height: 1;
@@ -133,7 +133,7 @@ a:focus {
 	.frame {
 		position: fixed;
 		text-align: left;
-		z-index: 10000;
+		z-index: 0;
 		top: 0;
 		left: 0;
 		display: grid;
