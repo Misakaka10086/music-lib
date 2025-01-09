@@ -10,7 +10,7 @@ import TagChip from "@/app/components/ui/TagChip";
 import ClickEffect from "@/app/components/Effects/ClickEffect";
 import FireflyBackground from "@/app/components/Effects/FireflyBackground";
 import MeteorBackground from "@/app/components/Effects/Meteor/MeteorBackground";
-
+import NightSky from "@/app/components/Effects/NightSky/NightSky";
 export default function Page() {
   const [mounted, setMounted] = useState(false);
   const theme = useTheme();
@@ -47,6 +47,11 @@ export default function Page() {
         waveSpeed={0.001}
         speedVariation={0.01}
         accelerationFactor={0.01}
+      />
+      <NightSky
+        starCount={400}
+        twinkleSpeed={3}
+        starSize={1.5}
       />
       <Search placeholder="搜索你想听的歌曲 点击卡片复制点歌" />
       <TagChip />

@@ -37,7 +37,7 @@ export default function MusicTable() {
   }
 
   return (
-    <Box sx={{ padding: 2 }}>
+    <Box sx={{ padding: 2 }} position="relative">
       <TableContainer component={Paper} sx={{ backgroundColor: "transparent" }}>
         <Table sx={{ minWidth: 650 }} aria-label="music library table">
           <TableBody>

@@ -31,6 +31,7 @@ export default function MusicCard() {
       }}
       role="MusicCardContainer"
       aria-label="Music Card Container"
+      position="relative"
     >
       {filteredData.map((music) => (
         <div
