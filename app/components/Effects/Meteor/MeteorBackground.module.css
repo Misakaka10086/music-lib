@@ -11,7 +11,7 @@
 
 .meteor {
     position: absolute;
-    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+    background: linear-gradient(45deg, rgb(255, 255, 255), transparent);
     transform: rotate(-45deg);
     transform-origin: center;
     animation: meteorMove linear;

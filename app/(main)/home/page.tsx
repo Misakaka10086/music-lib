@@ -28,11 +28,10 @@ export default function Page() {
     <Box sx={{ p: 1 }}>
       <ClickEffect />
       <MeteorBackground 
-        meteorSize={1}
-        minTailLength={100}
-        maxTailLength={300}
+        minTailLength={150}
+        maxTailLength={1500}
         tailThickness={1}
-        frequency={15}
+        frequency={45}
       />
       <FireflyBackground
         count={10}

@@ -47,7 +47,7 @@ export default function MeteorBackground({
         const startY = -50 + (randomFactor * (window.innerHeight * 0.6));
         
         const tailLength = Math.random() * (maxTailLength - minTailLength) + minTailLength;
-        const duration = Math.random() * 2000 + 2000; // Random duration between 2-4 seconds
+        const duration = Math.random() * 500 + 300; // Random duration between 2-4 seconds
 
         const meteor: Meteor = {
             id: nextId.current++,
