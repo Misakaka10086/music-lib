@@ -52,6 +52,8 @@ export default function Page() {
         twinkleSpeed={3}
         starSize={0.5}
         rotateSpeed={0.0003}
+        centerSpeedRatio={100}
+        speedDecay={3}
       />
       <Search placeholder="搜索你想听的歌曲 点击卡片复制点歌" />
       <TagChip />

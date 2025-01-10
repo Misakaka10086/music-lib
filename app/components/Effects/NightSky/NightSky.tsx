@@ -8,6 +8,8 @@ interface NightSkyProps {
   twinkleSpeed?: number
   starSize?: number
   rotateSpeed?: number
+  centerSpeedRatio?: number
+  speedDecay?: number
 }
 
 interface Star {
@@ -18,6 +20,7 @@ interface Star {
   phase: number
   speed: number
   timing: number
+  rotateSpeed: number
 }
 
 interface TouchInfo {
@@ -30,7 +33,9 @@ export default function NightSky({
   starCount = 100,
   twinkleSpeed = 1,
   starSize = 2,
-  rotateSpeed = 0.02
+  rotateSpeed = 0.02,
+  centerSpeedRatio = 100,
+  speedDecay = 2
 }: NightSkyProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const starsRef = useRef<Star[]>([])
@@ -42,6 +47,7 @@ export default function NightSky({
   const lastSpeedUpdateTime = useRef<number>(0)
   const touchInfo = useRef<TouchInfo | null>(null)
   const isDecelerating = useRef<boolean>(false)
+  const lastFrameTime = useRef<number>(0)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -57,6 +63,14 @@ export default function NightSky({
       currentRotateSpeed.current = targetRotateSpeed.current
       lastSpeedUpdateTime.current = Date.now()
       isDecelerating.current = false
+    }
+
+    // Calculate star speed multiplier based on radius
+    const calculateSpeedMultiplier = (radius: number) => {
+      // radius 是 0-1 的值，0 表示中心，1 表示边缘
+      // 使用 speedDecay 来控制衰减曲线
+      // 使用 centerSpeedRatio 来控制中心和边缘的速度比
+      return 1 + Math.pow(1 - radius, speedDecay) * (centerSpeedRatio - 1)
     }
 
     // Smooth deceleration animation
@@ -99,7 +113,7 @@ export default function NightSky({
 
     // Debounced scroll end detection
     const handleScrollEnd = () => {
-      if (Date.now() - lastSpeedUpdateTime.current > 50) { // 50ms without updates
+      if (Date.now() - lastSpeedUpdateTime.current > 50) {
         startDeceleration()
       } else {
         requestAnimationFrame(handleScrollEnd)
@@ -164,6 +178,7 @@ export default function NightSky({
       starsRef.current = Array.from({ length: starCount }, () => {
         const radius = Math.sqrt(Math.random())
         const angle = Math.random() * Math.PI * 2
+        const speedMultiplier = calculateSpeedMultiplier(radius)
         return {
           radius,
           angle,
@@ -171,28 +186,25 @@ export default function NightSky({
           opacity: 0,
           phase: Math.random() * Math.PI * 2,
           speed: twinkleSpeed * (0.5 + Math.random() * 1.5),
-          timing: Math.floor(Math.random() * 3)
+          timing: Math.floor(Math.random() * 3),
+          rotateSpeed: speedMultiplier
         }
       })
     }
 
     // Draw star function with dynamic center calculation
-    const drawStar = (ctx: CanvasRenderingContext2D, star: Star, viewBox: { width: number, height: number }) => {
+    const drawStar = (ctx: CanvasRenderingContext2D, star: Star, viewBox: { width: number, height: number }, deltaTime: number) => {
       const centerX = viewBox.width / 2
       const centerY = viewBox.height / 2
       const maxRadius = Math.max(centerX, centerY) * 2
 
+      star.angle += currentRotateSpeed.current * star.rotateSpeed * deltaTime * 0.001
+
       const actualRadius = star.radius * maxRadius
-      const baseX = actualRadius * Math.cos(star.angle)
-      const baseY = actualRadius * Math.sin(star.angle)
+      const rotatedX = centerX + actualRadius * Math.cos(star.angle)
+      const rotatedY = centerY + actualRadius * Math.sin(star.angle)
 
       ctx.save()
-      ctx.translate(centerX, centerY)
-      
-      const angle = rotationRef.current
-      const rotatedX = baseX * Math.cos(angle) - baseY * Math.sin(angle)
-      const rotatedY = baseX * Math.sin(angle) + baseY * Math.cos(angle)
-      
       ctx.translate(rotatedX, rotatedY)
 
       let progress = (Date.now() % (star.speed * 1000)) / (star.speed * 1000)
@@ -220,8 +232,11 @@ export default function NightSky({
     }
 
     // Animation function
-    const animate = () => {
+    const animate = (timestamp: number) => {
       if (!canvas || !ctx) return
+
+      const deltaTime = lastFrameTime.current ? timestamp - lastFrameTime.current : 0
+      lastFrameTime.current = timestamp
 
       const viewBox = {
         width: canvas.getBoundingClientRect().width,
@@ -229,10 +244,9 @@ export default function NightSky({
       }
 
       ctx.clearRect(0, 0, viewBox.width, viewBox.height)
-      rotationRef.current += currentRotateSpeed.current
 
       starsRef.current.forEach(star => {
-        drawStar(ctx, star, viewBox)
+        drawStar(ctx, star, viewBox, deltaTime)
       })
 
       // Check for scroll end
@@ -259,7 +273,8 @@ export default function NightSky({
     // Setup
     const { width, height } = updateCanvasSize()
     initStars()
-    animate()
+    lastFrameTime.current = performance.now()
+    animate(performance.now())
 
     // Add event listeners
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -279,7 +294,7 @@ export default function NightSky({
       }
       isDecelerating.current = false
     }
-  }, [starCount, twinkleSpeed, starSize, rotateSpeed])
+  }, [starCount, twinkleSpeed, starSize, rotateSpeed, centerSpeedRatio, speedDecay])
 
   return (
     <div className={styles.container}>
