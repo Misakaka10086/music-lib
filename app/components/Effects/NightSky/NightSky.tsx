@@ -20,6 +20,12 @@ interface Star {
   timing: number
 }
 
+interface TouchInfo {
+  startY: number
+  lastY: number
+  lastTime: number
+}
+
 export default function NightSky({
   starCount = 100,
   twinkleSpeed = 1,
@@ -30,6 +36,12 @@ export default function NightSky({
   const starsRef = useRef<Star[]>([])
   const rotationRef = useRef<number>(0)
   const animationFrameRef = useRef<number>(0)
+  const lastScrollY = useRef<number>(0)
+  const currentRotateSpeed = useRef<number>(rotateSpeed)
+  const targetRotateSpeed = useRef<number>(rotateSpeed)
+  const lastSpeedUpdateTime = useRef<number>(0)
+  const touchInfo = useRef<TouchInfo | null>(null)
+  const isDecelerating = useRef<boolean>(false)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -38,19 +50,106 @@ export default function NightSky({
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
+    // Update rotation speed with smooth transition
+    const updateRotationSpeed = (moveSpeed: number) => {
+      const speedIncrease = Math.min(moveSpeed * 0.1, rotateSpeed * 10)
+      targetRotateSpeed.current = rotateSpeed + speedIncrease
+      currentRotateSpeed.current = targetRotateSpeed.current
+      lastSpeedUpdateTime.current = Date.now()
+      isDecelerating.current = false
+    }
+
+    // Smooth deceleration animation
+    const startDeceleration = () => {
+      if (isDecelerating.current) return
+      isDecelerating.current = true
+      
+      const decelerate = () => {
+        if (!isDecelerating.current) return
+
+        const currentSpeed = currentRotateSpeed.current
+        const targetSpeed = rotateSpeed
+        const diff = currentSpeed - targetSpeed
+
+        if (Math.abs(diff) < 0.0001) {
+          currentRotateSpeed.current = targetSpeed
+          isDecelerating.current = false
+          return
+        }
+
+        // Exponential decay
+        currentRotateSpeed.current = targetSpeed + diff * 0.95
+
+        requestAnimationFrame(decelerate)
+      }
+
+      requestAnimationFrame(decelerate)
+    }
+
+    // Handle scroll speed for desktop
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      const scrollDelta = Math.abs(currentScrollY - lastScrollY.current)
+      lastScrollY.current = currentScrollY
+      
+      if (scrollDelta > 0) {
+        updateRotationSpeed(scrollDelta)
+      }
+    }
+
+    // Debounced scroll end detection
+    const handleScrollEnd = () => {
+      if (Date.now() - lastSpeedUpdateTime.current > 50) { // 50ms without updates
+        startDeceleration()
+      } else {
+        requestAnimationFrame(handleScrollEnd)
+      }
+    }
+
+    // Handle touch events for mobile
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        touchInfo.current = {
+          startY: e.touches[0].clientY,
+          lastY: e.touches[0].clientY,
+          lastTime: Date.now()
+        }
+        isDecelerating.current = false
+      }
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!touchInfo.current || e.touches.length !== 1) return
+
+      const currentY = e.touches[0].clientY
+      const currentTime = Date.now()
+      const deltaY = Math.abs(currentY - touchInfo.current.lastY)
+      const deltaTime = currentTime - touchInfo.current.lastTime
+
+      if (deltaTime > 0) {
+        const speed = (deltaY / deltaTime) * 1000
+        updateRotationSpeed(speed)
+      }
+
+      touchInfo.current.lastY = currentY
+      touchInfo.current.lastTime = currentTime
+    }
+
+    const handleTouchEnd = () => {
+      touchInfo.current = null
+      startDeceleration()
+    }
+
     // Set canvas size to match display size
     const updateCanvasSize = () => {
       const rect = canvas.getBoundingClientRect()
       const dpr = window.devicePixelRatio || 1
       
-      // Set the canvas size in pixels
       canvas.width = rect.width * dpr
       canvas.height = rect.height * dpr
       
-      // Scale the context to ensure correct drawing operations
       ctx.scale(dpr, dpr)
       
-      // Set the CSS size to match the desired layout size
       canvas.style.width = `${rect.width}px`
       canvas.style.height = `${rect.height}px`
       
@@ -130,11 +229,16 @@ export default function NightSky({
       }
 
       ctx.clearRect(0, 0, viewBox.width, viewBox.height)
-      rotationRef.current += rotateSpeed
+      rotationRef.current += currentRotateSpeed.current
 
       starsRef.current.forEach(star => {
         drawStar(ctx, star, viewBox)
       })
+
+      // Check for scroll end
+      if (!touchInfo.current && !isDecelerating.current) {
+        handleScrollEnd()
+      }
 
       animationFrameRef.current = requestAnimationFrame(animate)
     }
@@ -157,14 +261,23 @@ export default function NightSky({
     initStars()
     animate()
 
-    // Handle resize
+    // Add event listeners
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
+    window.addEventListener('touchmove', handleTouchMove, { passive: true })
+    window.addEventListener('touchend', handleTouchEnd)
     window.addEventListener('resize', updateCanvasSize)
 
     return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('touchend', handleTouchEnd)
       window.removeEventListener('resize', updateCanvasSize)
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
       }
+      isDecelerating.current = false
     }
   }, [starCount, twinkleSpeed, starSize, rotateSpeed])
 
