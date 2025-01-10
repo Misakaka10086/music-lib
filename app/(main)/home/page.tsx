@@ -48,10 +48,10 @@ export default function Page() {
         accelerationFactor={0.01}
       />
       <NightSky
-        starCount={400}
+        starCount={10000}
         twinkleSpeed={3}
-        starSize={1.5}
-        rotateSpeed={0.01}
+        starSize={0.5}
+        rotateSpeed={0.0003}
       />
       <Search placeholder="搜索你想听的歌曲 点击卡片复制点歌" />
       <TagChip />
