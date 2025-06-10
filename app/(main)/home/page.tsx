@@ -7,10 +7,22 @@ import MusicTable from "@/app/components/MusicList/MusicTable";
 import MusicCard from "@/app/components/MusicList/MusicCard";
 import { useMediaQuery, useTheme } from "@mui/material";
 import TagChip from "@/app/components/ui/TagChip";
-import ClickEffect from "@/app/components/Effects/ClickEffect";
-import FireflyBackground from "@/app/components/Effects/FireflyBackground";
-import MeteorBackground from "@/app/components/Effects/Meteor/MeteorBackground";
-import NightSky from "@/app/components/Effects/NightSky/NightSky";
+// import ClickEffect from "@/app/components/Effects/ClickEffect"; // Lazy loaded
+// import FireflyBackground from "@/app/components/Effects/FireflyBackground"; // Lazy loaded
+// import MeteorBackground from "@/app/components/Effects/Meteor/MeteorBackground"; // Lazy loaded
+import NightSky from "@/app/components/Effects/NightSky/NightSky"; // Keep one non-lazy for now or also lazy load
+import dynamic from "next/dynamic";
+
+const ClickEffect = dynamic(() => import("@/app/components/Effects/ClickEffect"), { ssr: false });
+const MeteorBackground = dynamic(() => import("@/app/components/Effects/Meteor/MeteorBackground"), { ssr: false });
+const FireflyBackground = dynamic(() => import("@/app/components/Effects/FireflyBackground"), { ssr: false });
+// Example of adding a simple loading component:
+// const FireflyBackground = dynamic(() => import("@/app/components/Effects/FireflyBackground"), {
+//   ssr: false,
+//   loading: () => <p>Loading background...</p>
+// });
+
+
 export default function Page() {
   const [mounted, setMounted] = useState(false);
   const theme = useTheme();
@@ -48,7 +60,7 @@ export default function Page() {
         accelerationFactor={0.01}
       />
       <NightSky
-        starCount={10000}
+         starCount={1000} // Reduced from 10000 to 1000
         twinkleSpeed={3}
         starSize={0.5}
         rotateSpeed={0.0003}

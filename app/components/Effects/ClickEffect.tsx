@@ -133,4 +133,4 @@ const ClickEffect: React.FC<ClickEffectProps> = ({
   );
 };
 
-export default ClickEffect;
+export default React.memo(ClickEffect);

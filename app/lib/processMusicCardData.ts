@@ -10,10 +10,14 @@ const pool = createPool({
 export async function fetchAllMusicCardData(
   pageSize: number,
   page: number
-): Promise<MusicCardData[]> {
+): Promise<{ data: MusicCardData[]; total_count: number }> {
   try {
     // Calculate offset for pagination
     const offset = (page - 1) * pageSize;
+
+    // Fetch total count
+    const totalCountResult = await pool.query(`SELECT COUNT(*) FROM music_info`);
+    const total_count = parseInt(totalCountResult.rows[0].count, 10);
 
     // Fetch paginated music info
     const musicInfoResult = await pool.query(
@@ -28,31 +32,32 @@ export async function fetchAllMusicCardData(
 
     // Get music IDs from the current page
     const musicIds = musicInfoResult.rows.map((row) => row.id);
+    let musicData: MusicCardData[] = [];
 
-    // Fetch tags only for the current page's music
-    const musicTagsResult = await pool.query(
-      `
-      SELECT music_info_id, tag
-      FROM music_tag
-      WHERE music_info_id = ANY($1)
-    `,
-      [musicIds]
-    );
+    if (musicIds.length > 0) {
+      // Fetch tags only for the current page's music
+      const musicTagsResult = await pool.query(
+        `
+        SELECT music_info_id, tag
+        FROM music_tag
+        WHERE music_info_id = ANY($1)
+      `,
+        [musicIds]
+      );
 
-    // Create a map to efficiently group tags by music_info_id
-    const tagsByMusicId: { [key: string]: string[] } = {};
-    musicTagsResult.rows.forEach((row) => {
-      const { music_info_id, tag } = row;
-      if (tagsByMusicId[music_info_id]) {
-        tagsByMusicId[music_info_id].push(tag);
-      } else {
-        tagsByMusicId[music_info_id] = [tag];
-      }
-    });
+      // Create a map to efficiently group tags by music_info_id
+      const tagsByMusicId: { [key: string]: string[] } = {};
+      musicTagsResult.rows.forEach((row) => {
+        const { music_info_id, tag } = row;
+        if (tagsByMusicId[music_info_id]) {
+          tagsByMusicId[music_info_id].push(tag);
+        } else {
+          tagsByMusicId[music_info_id] = [tag];
+        }
+      });
 
-    // Map the results to MusicCardData
-    const allMusicData: MusicCardData[] = musicInfoResult.rows.map(
-      (musicInfo) => {
+      // Map the results to MusicCardData
+      musicData = musicInfoResult.rows.map((musicInfo) => {
         return {
           music_id: musicInfo.id,
           image_url: musicInfo.image_url,
@@ -61,13 +66,13 @@ export async function fetchAllMusicCardData(
           favorite: musicInfo.favorite,
           tags: tagsByMusicId[musicInfo.id] || [],
         };
-      }
-    );
+      });
+    }
 
-    return allMusicData;
+    return { data: musicData, total_count };
   } catch (error) {
     console.error("Error fetching music card data:", error);
-    return [];
+    return { data: [], total_count: 0 };
   }
 }
 
@@ -169,9 +174,31 @@ export async function deleteMusicCardDataByMusicId(music_id: string) {
 
 export async function fetchFilteredMusicCardData(
   query: string,
-): Promise<MusicCardData[]> {
+  pageSize: number,
+  page: number
+): Promise<{ data: MusicCardData[]; total_count: number }> {
   try {
-    // Fetch music info that matches title, artist or tags
+    const offset = (page - 1) * pageSize;
+    const searchPattern = `%${query}%`;
+
+    // Fetch total count of filtered items
+    // This query is a bit complex due to the JOIN and GROUP BY.
+    // It first finds all music_info IDs that match the criteria, then counts them.
+    const totalCountResult = await pool.query(
+      `
+      SELECT COUNT(DISTINCT mi.id)
+      FROM music_info mi
+      LEFT JOIN music_tag mt ON mi.id = mt.music_info_id
+      WHERE
+        mi.music_title ILIKE $1 OR
+        mi.original_artist ILIKE $1 OR
+        mt.tag ILIKE $1
+    `,
+      [searchPattern]
+    );
+    const total_count = parseInt(totalCountResult.rows[0].count, 10);
+
+    // Fetch paginated music info that matches title, artist or tags
     const musicInfoResult = await pool.query(
       `
       SELECT mi.id, mi.image_url, mi.music_title, mi.original_artist, mi.favorite
@@ -183,37 +210,36 @@ export async function fetchFilteredMusicCardData(
         mt.tag ILIKE $1
       GROUP BY mi.id
       ORDER BY mi.id
+      LIMIT $2 OFFSET $3
     `,
-      [`%${query}%`]
+      [searchPattern, pageSize, offset]
     );
 
-    // Get music IDs from the results
     const musicIds = musicInfoResult.rows.map((row) => row.id);
+    let musicData: MusicCardData[] = [];
 
-    // Fetch tags only for the matched music
-    const musicTagsResult = await pool.query(
-      `
-      SELECT music_info_id, tag
-      FROM music_tag
-      WHERE music_info_id = ANY($1)
-    `,
-      [musicIds]
-    );
+    if (musicIds.length > 0) {
+      // Fetch tags only for the current page's music
+      const musicTagsResult = await pool.query(
+        `
+        SELECT music_info_id, tag
+        FROM music_tag
+        WHERE music_info_id = ANY($1)
+      `,
+        [musicIds]
+      );
 
-    // Create a map to efficiently group tags by music_info_id
-    const tagsByMusicId: { [key: string]: string[] } = {};
-    musicTagsResult.rows.forEach((row) => {
-      const { music_info_id, tag } = row;
-      if (tagsByMusicId[music_info_id]) {
-        tagsByMusicId[music_info_id].push(tag);
-      } else {
-        tagsByMusicId[music_info_id] = [tag];
-      }
-    });
+      const tagsByMusicId: { [key: string]: string[] } = {};
+      musicTagsResult.rows.forEach((row) => {
+        const { music_info_id, tag } = row;
+        if (tagsByMusicId[music_info_id]) {
+          tagsByMusicId[music_info_id].push(tag);
+        } else {
+          tagsByMusicId[music_info_id] = [tag];
+        }
+      });
 
-    // Map the results to MusicCardData
-    const allMusicData: MusicCardData[] = musicInfoResult.rows.map(
-      (musicInfo) => {
+      musicData = musicInfoResult.rows.map((musicInfo) => {
         return {
           music_id: musicInfo.id,
           image_url: musicInfo.image_url,
@@ -222,13 +248,13 @@ export async function fetchFilteredMusicCardData(
           favorite: musicInfo.favorite,
           tags: tagsByMusicId[musicInfo.id] || [],
         };
-      }
-    );
+      });
+    }
 
-    return allMusicData;
+    return { data: musicData, total_count };
   } catch (error) {
-    console.error("Error fetching music card data:", error);
-    return [];
+    console.error("Error fetching filtered music card data:", error);
+    return { data: [], total_count: 0 };
   }
 }
 

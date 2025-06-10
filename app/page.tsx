@@ -1,18 +1,27 @@
 "use client";
-import Image from "next/image";
+// import Image from "next/image"; // Unused import
 import styles from "./page.module.css";
-import Firefly from "./components/Firefly/Firefly";
+// import Firefly from "./components/Firefly/Firefly"; // This component seems unused here, was it meant to be FireflyBackground?
 import { Box, Typography, Button } from "@mui/material";
 import { useRouter } from "next/navigation";
 import "@fontsource/italianno";
-import SwirlBackground from "./components/SwirlBackground";
-import ClickEffect from "./components/Effects/ClickEffect";
+// import SwirlBackground from "./components/SwirlBackground"; // Lazy loaded
+// import ClickEffect from "./components/Effects/ClickEffect"; // Lazy loaded
+import dynamic from "next/dynamic";
+
+const SwirlBackground = dynamic(() => import("./components/SwirlBackground"), { ssr: false });
+const ClickEffect = dynamic(() => import("./components/Effects/ClickEffect"), { ssr: false });
+
+
 export default function Home() {
   const router = useRouter();
   return (
     <>
       <SwirlBackground />
       <ClickEffect />
+      {/* The Firefly component import was present but Firefly itself was not used in the JSX.
+          If FireflyBackground was intended, it's not used on this page per the original code.
+          Keeping JSX as it was. */}
       <Box
         sx={{
           height: "100vh",

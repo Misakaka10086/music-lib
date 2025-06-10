@@ -1,74 +1,59 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
-import Fuse from "fuse.js";
-import { fetchAllMusicCardData } from "@/app/lib/processMusicCardData";
+import { fetchAllMusicCardData, fetchFilteredMusicCardData } from "@/app/lib/processMusicCardData";
 import { MusicCardData } from "@/app/components/MusicList/types";
 
+const DEFAULT_PAGE_SIZE = 20;
+
 export function useMusicData() {
-    const [allMusicData, setAllMusicData] = useState<MusicCardData[]>([]);
-    const [filteredData, setFilteredData] = useState<MusicCardData[]>([]);
+    const [musicData, setMusicData] = useState<MusicCardData[]>([]);
     const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE); // Future: could be user-configurable
+    const [totalPages, setTotalPages] = useState(0);
     const searchParams = useSearchParams();
+    const searchQuery = searchParams.get("q")?.toLowerCase() || "";
 
-    // Fetch all music data once when component mounts
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await fetchAllMusicCardData(Number.MAX_SAFE_INTEGER, 1);
-                setAllMusicData(data);
-            } catch (error) {
-                console.error("Error fetching music data:", error);
-            } finally {
-                setLoading(false);
+    const fetchData = useCallback(async (page: number, pSize: number, query: string) => {
+        setLoading(true);
+        try {
+            let result;
+            if (query.trim()) {
+                result = await fetchFilteredMusicCardData(query.trim(), pSize, page);
+            } else {
+                result = await fetchAllMusicCardData(pSize, page);
             }
-        };
-        fetchData();
-    }, []);
+            setMusicData(result.data);
+            setTotalPages(Math.ceil(result.total_count / pSize));
+        } catch (error) {
+            console.error("Error fetching music data:", error);
+            setMusicData([]);
+            setTotalPages(0);
+        } finally {
+            setLoading(false);
+        }
+    }, []); // No dependencies, relies on arguments
 
-    // Initialize Fuse.js
-    const fuse = useMemo(() => {
-        return new Fuse(allMusicData, {
-            keys: ["music_title", "original_artist", "tags"],
-            threshold: 0.3,
-        });
-    }, [allMusicData]);
-
-    // Filter data based on search query
+    // Effect to fetch data when page, pageSize, or query changes
     useEffect(() => {
-        const query = searchParams.get("q")?.toLowerCase() || "";
-        if (!query.trim()) {
-            setFilteredData(allMusicData);
-            return;
+        fetchData(currentPage, pageSize, searchQuery);
+    }, [currentPage, pageSize, searchQuery, fetchData]);
+
+    // Reset to page 1 when search query changes
+    useEffect(() => {
+        if (searchQuery) { // Or even if it becomes empty from a non-empty state
+            setCurrentPage(1);
         }
+    }, [searchQuery]);
 
-        // First, perform a search for the entire query string
-        const exactSearchResults = fuse.search(query.trim()).map(result => result.item);
-
-        // If the query contains multiple words, perform an intersection search
-        const queryWords = query.trim().split(/\s+/).filter(word => word.trim() !== '');
-        let intersectionResults: MusicCardData[] = [];
-
-        if (queryWords.length > 1) {
-            const resultsByWord = queryWords.map(word =>
-                fuse.search(word).map(result => result.item)
-            );
-
-            intersectionResults = allMusicData.filter(item =>
-                resultsByWord.every(results => results.includes(item))
-            );
-        }
-
-        // Combine the results, prioritizing exact matches and avoiding duplicates
-        const combinedResults = [
-            ...exactSearchResults,
-            ...intersectionResults.filter(item => !exactSearchResults.includes(item))
-        ];
-
-        setFilteredData(combinedResults);
-    }, [searchParams, fuse, allMusicData]);
 
     return {
-        filteredData,
-        loading
+        musicData, // Renamed from filteredData, represents the current view's data
+        loading,
+        currentPage,
+        setCurrentPage, // Allows UI to change page
+        pageSize,
+        setPageSize, // Allows UI to change page size (optional)
+        totalPages,
     };
-} 
+}

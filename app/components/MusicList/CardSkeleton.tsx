@@ -3,11 +3,46 @@
 import React from "react";
 import { Card, CardContent, Box, Skeleton } from "@mui/material";
 
-interface CardSkeletonProps {
-  count?: number; // 设置骨架的数量
+export interface CardSkeletonProps { // Exporting for potential use elsewhere
+  count?: number;
+  isCardVariant?: boolean; // New prop
 }
 
-const CardSkeleton: React.FC<CardSkeletonProps> = ({ count = 12 }) => {
+const CardSkeleton: React.FC<CardSkeletonProps> = ({ count = 12, isCardVariant = false }) => {
+
+  const SingleCardSkeleton = () => (
+    <Card sx={{ display: "flex" }}>
+      <Skeleton
+        variant="rectangular"
+        sx={{ width: 140, height: 140, flexShrink: 0, alignSelf: "center" }}
+      />
+      <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
+        <CardContent>
+          <Skeleton variant="text" width="80%" height={28} sx={{ mb: 1 }} />
+          <Skeleton variant="text" width="60%" height={20} sx={{ mb: 1 }} />
+          <Box sx={{ mt: 1, display: "flex", gap: 0.5, flexWrap: "wrap" }}>
+            {Array.from({ length: 3 }).map((_, chipIndex) => (
+              <Skeleton
+                key={chipIndex}
+                variant="rounded"
+                width={60}
+                height={24}
+                sx={{ borderRadius: 12 }}
+              />
+            ))}
+          </Box>
+        </CardContent>
+      </Box>
+    </Card>
+  );
+
+  if (isCardVariant) {
+    // If isCardVariant is true, MusicCard.tsx will loop and render this.
+    // So, CardSkeleton itself should just return one instance.
+    return <SingleCardSkeleton />;
+  }
+
+  // Original behavior: render a grid of 'count' skeletons
   return (
     <Box
       sx={{
@@ -17,29 +52,7 @@ const CardSkeleton: React.FC<CardSkeletonProps> = ({ count = 12 }) => {
       }}
     >
       {Array.from({ length: count }).map((_, index) => (
-        <Card key={index} sx={{ display: "flex" }}>
-          <Skeleton
-            variant="rectangular"
-            sx={{ width: 140, height: 140, flexShrink: 0, alignSelf: "center" }}
-          />
-          <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
-            <CardContent>
-              <Skeleton variant="text" width="80%" height={28} sx={{ mb: 1 }} />
-              <Skeleton variant="text" width="60%" height={20} sx={{ mb: 1 }} />
-              <Box sx={{ mt: 1, display: "flex", gap: 0.5, flexWrap: "wrap" }}>
-                {Array.from({ length: 3 }).map((_, chipIndex) => (
-                  <Skeleton
-                    key={chipIndex}
-                    variant="rounded"
-                    width={60}
-                    height={24}
-                    sx={{ borderRadius: 12 }}
-                  />
-                ))}
-              </Box>
-            </CardContent>
-          </Box>
-        </Card>
+        <SingleCardSkeleton key={index} /> // Use the extracted single skeleton structure
       ))}
     </Box>
   );

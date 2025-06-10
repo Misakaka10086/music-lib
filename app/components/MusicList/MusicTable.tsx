@@ -16,13 +16,30 @@ import {
   TitleTypography,
   ArtistTypography,
 } from "@/app/components/ui/TypographyWithTheme";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useCopyToClipboard } from "@/app/lib/copyToClipboard";
 import TableSkeleton from "@/app/components/MusicList/TableSkeleton";
 import { useMusicData } from "@/app/hooks/useMusicData";
+import {
+  Button,
+  Typography,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Pagination,
+} from "@mui/material";
 
 export default function MusicTable() {
-  const { filteredData, loading } = useMusicData();
+  const {
+    musicData, // Renamed from filteredData
+    loading,
+    currentPage,
+    setCurrentPage,
+    pageSize,
+    setPageSize,
+    totalPages,
+  } = useMusicData();
   const copyToClipboard = useCopyToClipboard();
 
   const handleRowClick = useCallback(
@@ -32,16 +49,30 @@ export default function MusicTable() {
     [copyToClipboard]
   );
 
-  if (loading) {
+  if (loading && musicData.length === 0) { // Show skeleton if loading and no data yet
     return <TableSkeleton />;
   }
+
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    setCurrentPage(value);
+  };
+
+  // MUI's SelectChangeEvent is a bit tricky with generics for the direct event.target.value
+  const handlePageSizeChange = (event: any) => {
+    const newPageSize = parseInt(event.target.value as string, 10);
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to page 1 when page size changes
+  };
 
   return (
     <Box sx={{ padding: 2 }} position="relative">
       <TableContainer component={Paper} sx={{ backgroundColor: "transparent" }}>
         <Table sx={{ minWidth: 650 }} aria-label="music library table">
           <TableBody>
-            {filteredData.map((row) => (
+            {musicData.map((row) => (
               <TableRow
                 key={row.music_id}
                 hover={true}
@@ -83,6 +114,44 @@ export default function MusicTable() {
           </TableBody>
         </Table>
       </TableContainer>
+      {/* Pagination Controls */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: 2,
+          flexWrap: "wrap", // Allow wrapping on smaller screens
+        }}
+      >
+        <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+          <InputLabel id="page-size-select-label">Items/Page</InputLabel>
+          <Select
+            labelId="page-size-select-label"
+            id="page-size-select"
+            value={pageSize.toString()}
+            label="Items/Page"
+            onChange={handlePageSizeChange}
+          >
+            <MenuItem value={10}>10</MenuItem>
+            <MenuItem value={20}>20</MenuItem>
+            <MenuItem value={50}>50</MenuItem>
+            <MenuItem value={100}>100</MenuItem>
+          </Select>
+        </FormControl>
+
+        <Pagination
+          count={totalPages}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+          sx={{ marginTop: { xs: 2, md: 0 } }} // Add margin top on extra small screens
+        />
+
+        <Typography variant="body2" sx={{ m: 1, minWidth: 100, textAlign: 'right' }}>
+          Page {currentPage} of {totalPages}
+        </Typography>
+      </Box>
     </Box>
   );
 }

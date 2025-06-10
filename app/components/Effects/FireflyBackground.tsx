@@ -50,6 +50,22 @@ const FireflyBackground = ({
   accelerationFactor = 0.02, // Default acceleration factor
 }: FireflyBackgroundProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const parsedColorRef = useRef({ r: 0, g: 0, b: 0 });
+
+  useEffect(() => {
+    // Parse color whenever the color prop changes
+    try {
+      parsedColorRef.current = {
+        r: parseInt(color.slice(1, 3), 16),
+        g: parseInt(color.slice(3, 5), 16),
+        b: parseInt(color.slice(5, 7), 16),
+      };
+    } catch (e) {
+      console.error("Invalid color format for FireflyBackground:", color, e);
+      // Default to black or some other fallback if parsing fails
+      parsedColorRef.current = { r: 0, g: 0, b: 0 };
+    }
+  }, [color]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -154,9 +170,7 @@ const FireflyBackground = ({
           firefly.size * glowSize
         );
 
-        const r = parseInt(color.slice(1, 3), 16);
-        const g = parseInt(color.slice(3, 5), 16);
-        const b = parseInt(color.slice(5, 7), 16);
+        const { r, g, b } = parsedColorRef.current;
 
         gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${firefly.opacity})`);
         gradient.addColorStop(
@@ -186,7 +200,7 @@ const FireflyBackground = ({
     return () => {
       window.removeEventListener('resize', setCanvasSize);
     };
-  }, [count, color, minSize, maxSize, minSpeed, maxSpeed, glowSize, glowIntensity, curveIntensity, waveSpeed, speedVariation, accelerationFactor]);
+  }, [count, minSize, maxSize, minSpeed, maxSpeed, glowSize, glowIntensity, curveIntensity, waveSpeed, speedVariation, accelerationFactor]); // Removed 'color' from here as it's handled by the other useEffect
 
   return (
     <canvas
