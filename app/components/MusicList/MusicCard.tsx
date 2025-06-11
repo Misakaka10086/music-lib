@@ -7,37 +7,44 @@ import {
   Typography,
   Chip,
   Box,
-  Button,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Pagination,
-  // Typography, // Removed from second import block
+  // Removed Button, Select, MenuItem, FormControl, InputLabel, Pagination
+  CircularProgress, // Added for loading more
 } from "@mui/material";
-import Image from "next/image"; // Import next/image
+import Image from "next/image";
 import { useCopyToClipboard } from "@/app/lib/copyToClipboard";
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Added useEffect
 import CardSkeleton from "./CardSkeleton";
 import { useMusicData } from "@/app/hooks/useMusicData";
+import { useInView } from "react-intersection-observer"; // Added
 
 export default function MusicCard() {
   const [animatingCards, setAnimatingCards] = useState<Set<string>>(new Set());
   const {
-    musicData, // Renamed from filteredData
-    loading,
-    currentPage,
-    setCurrentPage,
-    pageSize,
-    setPageSize,
-    totalPages,
+    musicData,
+    loadMore,
+    hasMore,
+    initialLoading,
+    loadingMore,
+    pageSize, // Keep pageSize to determine number of skeletons
+    // error, // Can be used to display error messages
   } = useMusicData();
   const copyToClipboard = useCopyToClipboard();
 
-  if (loading && musicData.length === 0) { // Show skeleton if loading and no data yet
+  const { ref, inView } = useInView({
+    threshold: 0.5,
+    triggerOnce: false,
+  });
+
+  useEffect(() => {
+    if (inView && hasMore && !loadingMore && !initialLoading) {
+      loadMore();
+    }
+  }, [inView, hasMore, loadMore, loadingMore, initialLoading]);
+
+  // Show skeleton if initialLoading and no data yet
+  if (initialLoading && musicData.length === 0) {
     return (
       <>
-        {/* Keep the outer box for layout consistency during skeleton display if needed */}
         <Box sx={{ padding: { xs: 1, sm: 2 } }}>
           <Box
             sx={{
@@ -54,19 +61,6 @@ export default function MusicCard() {
       </>
     );
   }
-
-  const handlePageChange = (
-    event: React.ChangeEvent<unknown>,
-    value: number
-  ) => {
-    setCurrentPage(value);
-  };
-
-  const handlePageSizeChange = (event: any) => {
-    const newPageSize = parseInt(event.target.value as string, 10);
-    setPageSize(newPageSize);
-    setCurrentPage(1); // Reset to page 1
-  };
 
   return (
     <Box sx={{ padding: { xs: 1, sm: 2 } }}>
@@ -145,45 +139,25 @@ export default function MusicCard() {
         </div>
       ))}
     </Box>
-      {/* Pagination Controls */}
+
+      {/* Intersection Observer Trigger & Loading Indicators */}
       <Box
+        ref={ref}
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          paddingY: 2,
-          paddingX: { xs: 0, sm: 1 }, // Less padding on X for mobile
-          marginTop: 2,
-          flexWrap: "wrap",
+          height: 80, // Increased height to make it a more reliable trigger and hold spinner
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          mt: 2
         }}
       >
-        <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-          <InputLabel id="card-page-size-select-label">Items/Page</InputLabel>
-          <Select
-            labelId="card-page-size-select-label"
-            id="card-page-size-select"
-            value={pageSize.toString()}
-            label="Items/Page"
-            onChange={handlePageSizeChange}
-          >
-            <MenuItem value={10}>10</MenuItem>
-            <MenuItem value={20}>20</MenuItem>
-            <MenuItem value={50}>50</MenuItem>
-            <MenuItem value={100}>100</MenuItem>
-          </Select>
-        </FormControl>
-
-        <Pagination
-          count={totalPages}
-          page={currentPage}
-          onChange={handlePageChange}
-          color="primary"
-          sx={{ marginTop: { xs: 2, md: 0 } }}
-        />
-
-        <Typography variant="body2" sx={{ m: 1, minWidth: {xs: 'auto', md: 100}, textAlign: {xs: 'center', md: 'right'}, width: {xs: '100%', md: 'auto'} }}>
-          Page {currentPage} of {totalPages}
-        </Typography>
+        {loadingMore && <CircularProgress />}
+        {!loadingMore && !hasMore && musicData.length > 0 && (
+          <Typography variant="body2" color="textSecondary">
+            You've reached the end.
+          </Typography>
+        )}
       </Box>
     </Box>
   );

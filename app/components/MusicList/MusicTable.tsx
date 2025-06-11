@@ -20,27 +20,36 @@ import { useCallback, useEffect } from "react";
 import { useCopyToClipboard } from "@/app/lib/copyToClipboard";
 import TableSkeleton from "@/app/components/MusicList/TableSkeleton";
 import { useMusicData } from "@/app/hooks/useMusicData";
+import { useInView } from "react-intersection-observer";
 import {
-  Button,
-  Typography,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Pagination,
+  CircularProgress,
+  Typography
+  // Removed Pagination, Select, MenuItem, FormControl, InputLabel, Button
 } from "@mui/material";
 
 export default function MusicTable() {
   const {
-    musicData, // Renamed from filteredData
-    loading,
-    currentPage,
-    setCurrentPage,
-    pageSize,
-    setPageSize,
-    totalPages,
+    musicData,
+    loadMore,
+    hasMore,
+    initialLoading,
+    loadingMore,
+    // error, // Can be used to display error messages if needed
   } = useMusicData();
   const copyToClipboard = useCopyToClipboard();
+
+  const { ref, inView } = useInView({
+    threshold: 0.5, // Trigger when 50% of the element is visible
+    triggerOnce: false, // Keep triggering as it enters/leaves
+  });
+
+  useEffect(() => {
+    // Check for initialLoading to prevent firing loadMore on the first render cycle
+    // if inView happens to be true immediately.
+    if (inView && hasMore && !loadingMore && !initialLoading) {
+      loadMore();
+    }
+  }, [inView, hasMore, loadMore, loadingMore, initialLoading]);
 
   const handleRowClick = useCallback(
     (musicTitle: string) => {
@@ -49,23 +58,10 @@ export default function MusicTable() {
     [copyToClipboard]
   );
 
-  if (loading && musicData.length === 0) { // Show skeleton if loading and no data yet
+  // Show skeleton if initialLoading and no data yet
+  if (initialLoading && musicData.length === 0) {
     return <TableSkeleton />;
   }
-
-  const handlePageChange = (
-    event: React.ChangeEvent<unknown>,
-    value: number
-  ) => {
-    setCurrentPage(value);
-  };
-
-  // MUI's SelectChangeEvent is a bit tricky with generics for the direct event.target.value
-  const handlePageSizeChange = (event: any) => {
-    const newPageSize = parseInt(event.target.value as string, 10);
-    setPageSize(newPageSize);
-    setCurrentPage(1); // Reset to page 1 when page size changes
-  };
 
   return (
     <Box sx={{ padding: 2 }} position="relative">
@@ -74,7 +70,7 @@ export default function MusicTable() {
           <TableBody>
             {musicData.map((row) => (
               <TableRow
-                key={row.music_id}
+                key={row.music_id} // Consider using a more unique key if music_id can repeat across different data sets, though unlikely here
                 hover={true}
                 onClick={() => handleRowClick(row.music_title)}
                 sx={{
@@ -114,43 +110,15 @@ export default function MusicTable() {
           </TableBody>
         </Table>
       </TableContainer>
-      {/* Pagination Controls */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: 2,
-          flexWrap: "wrap", // Allow wrapping on smaller screens
-        }}
-      >
-        <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-          <InputLabel id="page-size-select-label">Items/Page</InputLabel>
-          <Select
-            labelId="page-size-select-label"
-            id="page-size-select"
-            value={pageSize.toString()}
-            label="Items/Page"
-            onChange={handlePageSizeChange}
-          >
-            <MenuItem value={10}>10</MenuItem>
-            <MenuItem value={20}>20</MenuItem>
-            <MenuItem value={50}>50</MenuItem>
-            <MenuItem value={100}>100</MenuItem>
-          </Select>
-        </FormControl>
 
-        <Pagination
-          count={totalPages}
-          page={currentPage}
-          onChange={handlePageChange}
-          color="primary"
-          sx={{ marginTop: { xs: 2, md: 0 } }} // Add margin top on extra small screens
-        />
-
-        <Typography variant="body2" sx={{ m: 1, minWidth: 100, textAlign: 'right' }}>
-          Page {currentPage} of {totalPages}
-        </Typography>
+      {/* Intersection Observer Trigger */}
+      <Box ref={ref} sx={{ height: 50, width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 2 }}>
+        {loadingMore && <CircularProgress size={30} />}
+        {!loadingMore && !hasMore && musicData.length > 0 && (
+          <Typography variant="body2" color="textSecondary">
+            You've reached the end.
+          </Typography>
+        )}
       </Box>
     </Box>
   );
