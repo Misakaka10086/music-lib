@@ -1,12 +1,6 @@
-// import type { NextConfig } from "next"; // CommonJS module, so use require for NextConfig if needed or just define directly
-
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
-
+// next.config.ts
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
   images: {
     remotePatterns: [
       {
@@ -14,14 +8,13 @@ const nextConfig = {
         hostname: '**',
       }
     ],
-    // unoptimized: true // Set to false or remove to enable optimization
+    // unoptimized: true, // Keep as false (default) or commented out for optimization
   },
+  // Add other Next.js configurations here (e.g., experimental from before if needed)
   // experimental: {
   //   turbo: {
   //     rules: {
-  //       // Option 1: Keep existing loaders and resolve React issues.
   //       "*.md": ["raw-loader"],
-  //       // Option 2: Ignore files causing conflicts.
   //       "*.mdx": {
   //         loaders: ["@mdx-js/loader"],
   //         as: "*.js",
@@ -31,4 +24,12 @@ const nextConfig = {
   // },
 };
 
-module.exports = withBundleAnalyzer(nextConfig);
+// Only require and use bundle analyzer if ANALYZE is true
+if (process.env.ANALYZE === 'true') {
+  const withBundleAnalyzer = require('@next/bundle-analyzer')({
+    enabled: true, // enabled is true because the outer if already checks ANALYZE
+  });
+  module.exports = withBundleAnalyzer(nextConfig);
+} else {
+  module.exports = nextConfig;
+}
